@@ -1,19 +1,23 @@
 # Dockup
 
-**TODO: Add description**
+This is a redo of chatops_deployer using Elixir to solve the following problems
+with the Ruby implementation:
 
-## Installation
+1. Dependency on Ruby
+2. Not able to deploy as self contained executable
+3. The app is not fault tolerant - sometimes gets stuck
+4. Streaming of logs can be done better
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+## Development
 
-  1. Add dockup to your list of dependencies in `mix.exs`:
+Clone the repo and run:
 
-        def deps do
-          [{:dockup, "~> 0.0.1"}]
-        end
+    mix deps.get
+    iex -S mix
 
-  2. Ensure dockup is started before your application:
+## Environment variables
 
-        def application do
-          [applications: [:dockup]]
-        end
+```bash
+DOCKUP_PORT - Port where dockup should listen for requests. Default "8000".
+DOCKUP_BIND - IP address to bind to. Default "0.0.0.0".
+```
