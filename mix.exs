@@ -14,7 +14,7 @@ defmodule Dockup.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger],
+    [applications: [:logger, :cowboy, :plug],
      mod: {Dockup, []}]
   end
 
@@ -28,6 +28,9 @@ defmodule Dockup.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:cowboy, "~>1.0.4"},
+      {:plug, "~>1.1.0"}
+    ]
   end
 end
