@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 
-# This is a fake "docker" executable meant to be used for development
+# This is a fake "docker-compose" executable meant to be used for development
 
 commands = [
   # Add all the valid commands here in the following format:
   # [ COMMAND_ARGS, STDOUT, STDERR, EXIT_STATUS]
-  [['run', '--name', 'cache', '-v', '/cache', 'tianon/true'], '', '', 0],
-  [['-v'], 'Docker version 1.8.1, build d12ea79', '', 0]
+  [['-v'], 'docker-compose version: 1.4.0', '', 0]
 ]
 
 commands.find do |cmd|
@@ -16,4 +15,4 @@ commands.find do |cmd|
   exit cmd[3]
 end
 
-fail "Fake docker doesn't know command #{ARGV.inspect}"
+fail "Fake docker-compose doesn't know command #{ARGV.inspect}"

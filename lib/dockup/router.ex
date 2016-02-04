@@ -24,6 +24,9 @@ defmodule Dockup.Router do
     # Check if workdir exists
     Dockup.Configs.workdir
 
+    # Check if docker and docker-compose versions are ok
+    Dockup.Container.check_docker_version
+
     # Make sure cache container exists
     Dockup.Container.create_cache_container
   end
