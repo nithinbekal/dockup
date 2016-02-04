@@ -10,7 +10,7 @@ defmodule Dockup.Container do
         x -> Logger.warn "Cannot create docker container #{container}. It may already exist"
       end
     rescue
-      RuntimeError -> raise "Command to create cache container failed"
+      _ -> raise "Command to create cache container failed"
     end
   end
 end
