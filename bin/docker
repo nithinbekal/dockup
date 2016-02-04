@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+# This is a fake "docker" executable meant to be used for development
+
+commands = [
+  # Add all the valid commands here in the following format:
+  # [ COMMAND_ARGS, STDOUT, STDERR, EXIT_STATUS]
+  [['run', '--name', 'cache', '-v', '/cache', 'tianon/true'], '', '', 0]
+]
+
+commands.find do |cmd|
+  next if cmd[0] != ARGV
+  STDOUT.puts cmd[1]
+  STDERR.puts cmd[2]
+  exit cmd[3]
+end
+
+fail "Fake docker doesn't know command #{ARGV.inspect}"

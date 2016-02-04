@@ -22,6 +22,9 @@ defmodule Dockup.Router do
 
   defp run_preflight_checks do
     # Check if workdir exists
-    dir = Dockup.Configs.workdir
+    Dockup.Configs.workdir
+
+    # Make sure cache container exists
+    Dockup.Container.create_cache_container
   end
 end

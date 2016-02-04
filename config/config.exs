@@ -6,7 +6,9 @@ use Mix.Config
 config :dockup,
   port: System.get_env("DOCKUP_PORT") || "8000",
   bind: System.get_env("DOCKUP_BIND") || "0.0.0.0",
-  workdir: System.get_env("DOCKUP_WORKDIR") || "."
+  workdir: System.get_env("DOCKUP_WORKDIR") || ".",
+  cache_container: System.get_env("DOCKUP_CACHE_CONTAINER") || "cache",
+  cache_volume: System.get_env("DOCKUP_CACHE_VOLUME") || "/cache"
 #
 # And access this configuration in your application as:
 #
