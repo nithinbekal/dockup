@@ -4,12 +4,12 @@ use Mix.Config
 
 # All configurations are assumed to be strings
 config :dockup,
-  port: System.get_env("DOCKUP_PORT") || "8000",
-  bind: System.get_env("DOCKUP_BIND") || "0.0.0.0",
-  workdir: System.get_env("DOCKUP_WORKDIR") || ".",
-  cache_container: System.get_env("DOCKUP_CACHE_CONTAINER") || "cache",
-  cache_volume: System.get_env("DOCKUP_CACHE_VOLUME") || "/cache",
-  github_webhook_secret: System.get_env("DOCKUP_GITHUB_WEBHOOK_SECRET")
+  port: "8000",
+  bind: "0.0.0.0",
+  workdir: ".",
+  cache_container: "cache",
+  cache_volume: "/cache"
+  #github_webhook_secret: nil
 #
 # And access this configuration in your application as:
 #
