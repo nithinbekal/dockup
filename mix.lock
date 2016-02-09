@@ -1,5 +1,11 @@
-%{"cowboy": {:hex, :cowboy, "1.0.4"},
+%{"bbmustache": {:hex, :bbmustache, "1.0.3"},
+  "cowboy": {:hex, :cowboy, "1.0.4"},
   "cowlib": {:hex, :cowlib, "1.0.2"},
+  "erlware_commons": {:hex, :erlware_commons, "0.15.0"},
+  "exrm": {:hex, :exrm, "1.0.0-rc7"},
+  "getopt": {:hex, :getopt, "0.8.2"},
   "gh_webhook_plug": {:hex, :gh_webhook_plug, "0.0.1"},
   "plug": {:hex, :plug, "1.1.0"},
-  "ranch": {:hex, :ranch, "1.2.1"}}
+  "providers": {:hex, :providers, "1.4.1"},
+  "ranch": {:hex, :ranch, "1.2.1"},
+  "relx": {:hex, :relx, "3.5.0"}}
