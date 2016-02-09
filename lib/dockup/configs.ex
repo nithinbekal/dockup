@@ -28,4 +28,8 @@ defmodule Dockup.Configs do
   def cache_volume do
     Application.fetch_env!(:dockup, :cache_volume)
   end
+
+  def github_webhook_secret do
+    Application.fetch_env!(:dockup, :github_webhook_secret)
+  end
 end

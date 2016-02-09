@@ -1,6 +1,8 @@
 defmodule Dockup.Router do
   use Plug.Router
+  require Logger
 
+  plug GhWebhookPlug, secret: Dockup.Configs.github_webhook_secret, path: "/gh-webhook", action: {__MODULE__, :gh_webhook}
   plug :match
   plug :dispatch
 
@@ -12,12 +14,24 @@ defmodule Dockup.Router do
     {:ok, _} = Plug.Adapters.Cowboy.http __MODULE__, [], [port: port, ip: ip]
   end
 
-  get "/" do
-    send_resp(conn, 200, "Hello Plug!")
+  post "/deploy" do
+    send_resp(conn, 200, "Hello Plug!") |> halt
+  end
+
+  get "/status" do
+    send_resp(conn, 200, "This will return a list of all live deployments") |> halt
+  end
+
+  post "/destroy" do
+    send_resp(conn, 200, "This will return a list of all live deployments") |> halt
   end
 
   match _ do
-    send_resp(conn, 404, "Nothing here")
+    send_resp(conn, 404, "Nothing here") |> halt
+  end
+
+  def gh_webhook(payload) do
+    Logger.info "Received webhook with payload #{inspect payload}"
   end
 
   defp run_preflight_checks do

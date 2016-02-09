@@ -8,7 +8,8 @@ config :dockup,
   bind: System.get_env("DOCKUP_BIND") || "0.0.0.0",
   workdir: System.get_env("DOCKUP_WORKDIR") || ".",
   cache_container: System.get_env("DOCKUP_CACHE_CONTAINER") || "cache",
-  cache_volume: System.get_env("DOCKUP_CACHE_VOLUME") || "/cache"
+  cache_volume: System.get_env("DOCKUP_CACHE_VOLUME") || "/cache",
+  github_webhook_secret: System.get_env("DOCKUP_GITHUB_WEBHOOK_SECRET")
 #
 # And access this configuration in your application as:
 #

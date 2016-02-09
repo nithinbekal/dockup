@@ -14,7 +14,7 @@ defmodule Dockup.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :cowboy, :plug],
+    [applications: [:logger, :cowboy, :plug, :gh_webhook_plug],
      mod: {Dockup, []}]
   end
 
@@ -30,7 +30,8 @@ defmodule Dockup.Mixfile do
   defp deps do
     [
       {:cowboy, "~>1.0.4"},
-      {:plug, "~>1.1.0"}
+      {:plug, "~>1.1.0"},
+      {:gh_webhook_plug, "~> 0.0.1"}
     ]
   end
 end
