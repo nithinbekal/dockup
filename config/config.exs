@@ -8,8 +8,8 @@ config :dockup,
   bind: "0.0.0.0",
   workdir: ".",
   cache_container: "cache",
-  cache_volume: "/cache"
-  #github_webhook_secret: nil
+  cache_volume: "/cache",
+  github_webhook_secret: nil
 #
 # And access this configuration in your application as:
 #
