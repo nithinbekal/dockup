@@ -15,7 +15,7 @@ defmodule Dockup.Router do
   end
 
   post "/deploy" do
-    send_resp(conn, 200, "Hello Plug!") |> halt
+    send_resp(conn, 200, "This should queue an app for deployment") |> halt
   end
 
   get "/status" do
