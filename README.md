@@ -8,6 +8,13 @@ with the Ruby implementation:
 3. The app is not fault tolerant - sometimes gets stuck
 4. Streaming of logs can be done better
 
+Other goals:
+
+1. Better directory structure for cloned repos (check feasibility of git worktree)
+2. Ability to list currently deployed apps
+3. Ability to write a check to see if app is up
+4. Ability to deploy static sites
+
 ## Development
 
 Clone the repo and run:
