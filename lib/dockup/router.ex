@@ -50,7 +50,7 @@ defmodule Dockup.Router do
   defp handle_deploy_request(conn) do
     conn
       |> parse_deploy_params
-      #|> DeployJob.perform
+      |> DeployJob.perform
   rescue
     MatchError ->
       send_resp(conn, 400, "Bad request") |> halt
