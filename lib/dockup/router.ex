@@ -3,6 +3,7 @@ defmodule Dockup.Router do
   require Logger
 
   plug GhWebhookPlug, secret: Dockup.Configs.github_webhook_secret, path: "/gh-webhook", action: {__MODULE__, :gh_webhook}
+  plug Plug.Parsers, parsers: [:json], json_decoder: Poison, pass: ["application/json"]
   plug :match
   plug :dispatch
 
@@ -15,6 +16,7 @@ defmodule Dockup.Router do
   end
 
   post "/deploy" do
+    handle_deploy_request(conn)
     send_resp(conn, 200, "This should queue an app for deployment") |> halt
   end
 
@@ -43,5 +45,20 @@ defmodule Dockup.Router do
 
     # Make sure cache container exists
     Dockup.Container.create_cache_container
+  end
+
+  defp handle_deploy_request(conn) do
+    conn
+      |> parse_deploy_params
+      #|> DeployJob.perform
+  rescue
+    MatchError ->
+      send_resp(conn, 400, "Bad request") |> halt
+    _ ->
+      send_resp(conn, 500, "Something went wrong") |> halt
+  end
+
+  defp parse_deploy_params(conn) do
+    %{"repository" => _a, "branch" => _b, "callback_url" => _c} = conn.params
   end
 end
