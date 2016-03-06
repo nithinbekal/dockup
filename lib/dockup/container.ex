@@ -16,13 +16,13 @@ defmodule Dockup.Container do
 
   def check_docker_version do
     {docker_version, 0} = Dockup.Command.run("docker", ["-v"])
-    unless Regex.match?(~r/Docker version 1\.8\..+/, docker_version) do
-      raise "Docker version should be >= 1.8.0"
+    unless Regex.match?(~r/Docker version 1\.([8-9]|([0-9][0-9]))(.*)+/, docker_version) do
+      raise "Docker version should be >= 1.8"
     end
 
     {docker_compose_version, 0} = Dockup.Command.run("docker-compose", ["-v"])
-    unless Regex.match?(~r/docker-compose version: 1\.4\..+/, docker_compose_version) do
-      raise "docker-compose version should be >= 1.4.0"
+    unless Regex.match?(~r/docker-compose version 1\.([4-9]|([0-9][0-9]))(.*)+/, docker_compose_version) do
+      raise "docker-compose version should be >= 1.4"
     end
   end
 end
