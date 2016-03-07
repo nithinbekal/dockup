@@ -21,7 +21,7 @@ defmodule Dockup.Container do
     end
 
     {docker_compose_version, 0} = Dockup.Command.run("docker-compose", ["-v"])
-    unless Regex.match?(~r/docker-compose version 1\.([4-9]|([0-9][0-9]))(.*)+/, docker_compose_version) do
+    unless Regex.match?(~r/docker-compose version.* 1\.([4-9]|([0-9][0-9]))(.*)+/, docker_compose_version) do
       raise "docker-compose version should be >= 1.4"
     end
   end
