@@ -53,10 +53,10 @@ defmodule Dockup.Router do
       |> DeployJob.spawn_process
   rescue
     MatchError ->
-      Logger.info "Received bad parameters to /deploy: #{inspect conn.params}"
+      Logger.error "Received bad parameters to /deploy: #{inspect conn.params}"
       send_resp(conn, 400, "Bad request") |> halt
     error ->
-      Logger.info "An error occured when queueing deployment: #{Exception.format_stacktrace(System.stacktrace)}"
+      Logger.error "An error occured when queueing deployment: #{Exception.format_stacktrace(System.stacktrace)}"
       send_resp(conn, 500, "Something went wrong") |> halt
   end
 
