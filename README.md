@@ -24,7 +24,14 @@ Clone the repo and run:
 
 ## Environment variables
 
-```bash
-DOCKUP_PORT - Port where dockup should listen for requests. Default "8000".
-DOCKUP_BIND - IP address to bind to. Default "0.0.0.0".
+Refer `config/config.exs` to see the list of configurations
+
+## API
+
+### /deploy
+
+This API endpoint is used to deploy a dockerized app.
+
+```
+curl -XPOST  -d '{"repository":"https://github.com/code-mancers/project.git","branch":"master","callback_url":"fake_callback"}' -H "Content-Type: application/json" http://localhost:8000/deploy
 ```
