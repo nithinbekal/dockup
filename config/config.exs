@@ -6,10 +6,11 @@ use Mix.Config
 config :dockup,
   port: "8000",
   bind: "0.0.0.0",
-  workdir: ".",
+  workdir: "./workdir",
   cache_container: "cache",
   cache_volume: "/cache",
-  github_webhook_secret: nil
+  github_webhook_secret: nil,
+  command_module: Dockup.ShellCommand
 #
 # And access this configuration in your application as:
 #
@@ -26,4 +27,4 @@ config :dockup,
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
 #
-#import_config "#{Mix.env}.exs"
+import_config "#{Mix.env}.exs"

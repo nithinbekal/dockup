@@ -17,7 +17,7 @@ defmodule Dockup.Router do
 
   post "/deploy" do
     handle_deploy_request(conn)
-    send_resp(conn, 200, "This should queue an app for deployment") |> halt
+    send_resp(conn, 200, "OK") |> halt
   end
 
   get "/status" do
@@ -50,11 +50,13 @@ defmodule Dockup.Router do
   defp handle_deploy_request(conn) do
     conn
       |> parse_deploy_params
-      |> DeployJob.perform
+      |> DeployJob.spawn_process
   rescue
     MatchError ->
+      Logger.error "Received bad parameters to /deploy: #{inspect conn.params}"
       send_resp(conn, 400, "Bad request") |> halt
-    _ ->
+    error ->
+      Logger.error "An error occured when queueing deployment: #{Exception.format_stacktrace(System.stacktrace)}"
       send_resp(conn, 500, "Something went wrong") |> halt
   end
 

@@ -1,10 +1,8 @@
-require Logger
-
 defmodule Dockup.Command do
+  require Logger
+  @command_module Application.get_env(:dockup, :command_module)
+
   def run(command, args) do
-    {out, exit_status} = System.cmd(command, args)
-    Logger.info "Running command #{command} with args #{inspect args}"
-    Logger.info out
-    {out, exit_status}
+    @command_module.run(command, args)
   end
 end
