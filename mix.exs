@@ -15,7 +15,9 @@ defmodule Dockup.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :cowboy, :plug, :gh_webhook_plug],
-     mod: {Dockup, []}]
+     mod: {Dockup, []},
+     env: [start_server: true]
+   ]
   end
 
   # Dependencies can be Hex packages:

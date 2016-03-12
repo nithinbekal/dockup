@@ -12,6 +12,7 @@ defmodule Dockup.Router do
 
     port = Dockup.Configs.port
     ip = Dockup.Configs.ip
+    Logger.info "Serving dockup on port #{port}"
     {:ok, _} = Plug.Adapters.Cowboy.http __MODULE__, [], [port: port, ip: ip]
   end
 
