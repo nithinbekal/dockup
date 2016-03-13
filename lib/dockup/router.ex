@@ -53,6 +53,9 @@ defmodule Dockup.Router do
 
     # Make sure cache container exists
     Dockup.Container.create_cache_container
+
+    # Make sure nginx container is running
+    Dockup.Container.run_nginx_container
   end
 
   defp parse_deploy_params(conn) do

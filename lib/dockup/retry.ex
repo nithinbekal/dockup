@@ -1,0 +1,22 @@
+defmodule Dockup.Retry do
+  # Credit for this code goes to safwank/ElixirRetry library
+  defmacro retry({ :in, _, [retries, sleep] }, do: block) do
+    quote do
+      run = fn(attempt, self) ->
+        if attempt <= unquote(retries) do
+          try do
+            unquote(block)
+          rescue
+            e ->
+              :timer.sleep(unquote(sleep))
+              self.(attempt + 1, self)
+          end
+        else
+          raise DockupException, "Reached max number of retries"
+        end
+      end
+
+      run.(1, run)
+    end
+  end
+end

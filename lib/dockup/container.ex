@@ -14,6 +14,21 @@ defmodule Dockup.Container do
     end
   end
 
+  def run_nginx_container do
+    {status, exit_code} = Dockup.Command.run("docker", ["inspect", "--format='{{.State.Running}}'", "nginx"])
+    if status == "false" do
+      {_output, 0} = Dockup.Command.run("docker", ["start", "nginx"])
+    end
+
+    if exit_code == 1 do
+      # Sometimes docker pull fails, so we retry -
+      # Try 5 times at an interval of 0.5 seconds
+      retry 5 in 500 do
+        {_output, 0} = Dockup.Command.run("docker", ["run", "--name", "nginx", "-p", "80:80", "-v", "nginx_sites_enabled:/etc/nginx/sites-enabled", "nginx:1.8"])
+      end
+    end
+  end
+
   def check_docker_version do
     {docker_version, 0} = Dockup.Command.run("docker", ["-v"])
     unless Regex.match?(~r/Docker version 1\.([8-9]|([0-9][0-9]))(.*)+/, docker_version) do
