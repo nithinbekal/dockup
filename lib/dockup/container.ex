@@ -1,6 +1,7 @@
-require Logger
-
 defmodule Dockup.Container do
+  require Logger
+  import Dockup.Retry
+
   def create_cache_container do
     try do
       container = Dockup.Configs.cache_container
