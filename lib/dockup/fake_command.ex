@@ -3,6 +3,7 @@ defmodule Dockup.FakeCommand do
   @registered_commands %{
     "docker" => %{
       ["run", "--name", "cache", "-v", "/cache", "tianon/true"] => {"", 0},
+      ["inspect", "--format='{{.State.Running}}'", "nginx"] => {"true", 0},
       ["-v"] => {"Docker version 1.8.1, build d12ea79", 0},
     },
 
