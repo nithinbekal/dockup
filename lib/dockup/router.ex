@@ -17,8 +17,15 @@ defmodule Dockup.Router do
   end
 
   post "/deploy" do
-    handle_deploy_request(conn)
-    send_resp(conn, 200, "OK") |> halt
+    case parse_deploy_params(conn) do
+      :error ->
+        Logger.error "Received bad parameters to /deploy: #{inspect conn.params}"
+        send_resp(conn, 400, "Bad request")
+      params ->
+        Logger.info "Deploying: #{inspect conn.params}"
+        DeployJob.spawn_process(params)
+        send_resp(conn, 200, "OK")
+    end
   end
 
   get "/status" do
@@ -48,20 +55,10 @@ defmodule Dockup.Router do
     Dockup.Container.create_cache_container
   end
 
-  defp handle_deploy_request(conn) do
-    conn
-      |> parse_deploy_params
-      |> DeployJob.spawn_process
-  rescue
-    MatchError ->
-      Logger.error "Received bad parameters to /deploy: #{inspect conn.params}"
-      send_resp(conn, 400, "Bad request") |> halt
-    error ->
-      Logger.error "An error occured when queueing deployment: #{Exception.format_stacktrace(System.stacktrace)}"
-      send_resp(conn, 500, "Something went wrong") |> halt
-  end
-
   defp parse_deploy_params(conn) do
     %{"repository" => _a, "branch" => _b, "callback_url" => _c} = conn.params
+  rescue
+    MatchError ->
+      :error
   end
 end
