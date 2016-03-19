@@ -10,7 +10,8 @@ config :dockup,
   cache_container: "cache",
   cache_volume: "/cache",
   github_webhook_secret: nil,
-  command_module: Dockup.ShellCommand
+  command_module: Dockup.ShellCommand,
+  start_server: true
 #
 # And access this configuration in your application as:
 #
