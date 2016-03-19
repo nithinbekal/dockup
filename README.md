@@ -22,6 +22,20 @@ Clone the repo and run:
     mix deps.get
     iex -S mix
 
+### Using Vagrant for testing
+
+A `Vagrantfile` is checked in which will provision an ubuntu machine with
+everything ready for testing the app. Here's how you can set it up:
+
+```
+$ vagrant up
+$ vagrant ssh
+$ mix local.hex
+$ mix deps.get
+$ mix clean
+$ mix compile
+```
+
 ## Environment variables
 
 Refer `config/config.exs` to see the list of configurations
