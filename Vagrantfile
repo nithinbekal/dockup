@@ -21,7 +21,7 @@ Vagrant.configure(2) do |config|
 
     # Install docker
     curl -sSL https://get.docker.com/ | sh
-    sudo usermod -aG docker ${USER}
+    sudo usermod -aG docker vagrant
 
     # Install docker compose
     sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
