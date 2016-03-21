@@ -23,7 +23,7 @@ defmodule Dockup.Router do
         send_resp(conn, 400, "Bad request")
       params ->
         Logger.info "Deploying: #{inspect conn.params}"
-        DeployJob.spawn_process(params)
+        Dockup.DeployJob.spawn_process(params)
         send_resp(conn, 200, "OK")
     end
   end
