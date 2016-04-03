@@ -111,5 +111,13 @@ defmodule Dockup.ContainerTest do
     assert logs =~ "Trying to pull nginx image"
     assert logs =~ "Nginx pulled and started"
   end
+
+  test "reload_nginx sends a kill signal to nginx docker container" do
+    defmodule NginxReloadCommand do
+      def run("docker", ["kill", "-s", "HUP", "nginx"]), do: {:ok, 0}
+    end
+
+    Dockup.Container.reload_nginx(NginxReloadCommand)
+  end
 end
 
