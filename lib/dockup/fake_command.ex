@@ -5,6 +5,7 @@ defmodule Dockup.FakeCommand do
       ["run", "--name", "cache", "-v", "/cache", "tianon/true"] => {"", 0},
       ["inspect", "--format='{{.State.Running}}'", "nginx"] => {"true", 0},
       ["-v"] => {"Docker version 1.8.1, build d12ea79", 0},
+      ["kill", "-s", "HUP", "nginx"] => {"", 0},
     },
 
     "docker-compose" => %{

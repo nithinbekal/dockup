@@ -39,6 +39,11 @@ defmodule Dockup.Container do
     end
   end
 
+  def reload_nginx(command \\ Dockup.Command) do
+    Logger.info "Reloading nxinx config"
+    {_out, 0} = command.run("docker", ["kill", "-s", "HUP", "nginx"])
+  end
+
   def check_docker_version(command \\ Dockup.Command) do
     {docker_version, 0} = command.run("docker", ["-v"])
     unless Regex.match?(~r/Docker version 1\.([8-9]|([0-9][0-9]))(.*)+/, docker_version) do
