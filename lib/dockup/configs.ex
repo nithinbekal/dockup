@@ -16,12 +16,8 @@ defmodule Dockup.Configs do
   end
 
   def workdir do
-    dir = System.get_env("DOCKUP_WORKDIR") || Application.fetch_env!(:dockup, :workdir)
-    File.mkdir_p dir
-    case File.exists?(dir) do
-      true -> dir
-      _ -> raise "Invalid workdir"
-    end
+    System.get_env("DOCKUP_WORKDIR") || Application.fetch_env!(:dockup, :workdir)
+    |> ensure_dir_exists
   end
 
   def cache_container do
@@ -34,5 +30,22 @@ defmodule Dockup.Configs do
 
   def github_webhook_secret do
     System.get_env("DOCKUP_GITHUB_WEBHOOK_SECRET") || Application.fetch_env!(:dockup, :github_webhook_secret)
+  end
+
+  def nginx_config_dir do
+    System.get_env("DOCKUP_NGINX_CONFIG_DIR") || Application.fetch_env!(:dockup, :nginx_config_dir)
+    |> ensure_dir_exists
+  end
+
+  def domain do
+    System.get_env("DOCKUP_DOMAIN") || Application.fetch_env!(:dockup, :domain)
+  end
+
+  defp ensure_dir_exists(dir) do
+    File.mkdir_p dir
+    case File.exists?(dir) do
+      true -> dir
+      _ -> raise "Invalid workdir"
+    end
   end
 end

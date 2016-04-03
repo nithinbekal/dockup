@@ -4,3 +4,4 @@
 erl_crash.dump
 *.ez
 /.vagrant
+/nginx_config_dir
