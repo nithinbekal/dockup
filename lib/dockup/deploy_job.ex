@@ -22,7 +22,9 @@ defmodule Dockup.DeployJob do
   end
 
   defp deploy(:static_site, project_id) do
-    # TODO
+    Logger.info "Deploying static site #{project_id}"
+    Dockup.NginxConfig.write_config(:static_site, project_id)
+    Dockup.Container.reload_nginx
   end
 
   defp deploy(_, app_id) do

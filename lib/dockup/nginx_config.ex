@@ -1,4 +1,5 @@
 defmodule Dockup.NginxConfig do
+  require Logger
   def static_site_config(project_id, url) do
     """
     server {
@@ -25,6 +26,7 @@ defmodule Dockup.NginxConfig do
   end
 
   def write_config(:static_site, project_id, haikunator \\ Dockup.Haikunator) do
+    Logger.info "Writing nginx config for #{project_id}"
     config = static_site_config(project_id, haikunator.haikunated_url)
     File.write(config_file(project_id), config)
   end
