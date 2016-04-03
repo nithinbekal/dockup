@@ -35,8 +35,7 @@ defmodule Dockup.Mixfile do
       {:plug, "~>1.1.0"},
       {:gh_webhook_plug, "~> 0.0.1"},
       {:exrm, "~> 1.0.0-rc7"},
-      {:poison, "~>2.1.0"},
-      {:meck, "~> 0.8.2", only: :test},
+      {:poison, "~>2.1.0"}
     ]
   end
 end

@@ -17,13 +17,14 @@ defmodule Dockup.Router do
   end
 
   post "/deploy" do
+    deploy_job = conn.assigns[:deploy_job] || Dockup.DeployJob
     case parse_deploy_params(conn) do
       :error ->
         Logger.error "Received bad parameters to /deploy: #{inspect conn.params}"
         send_resp(conn, 400, "Bad request")
       params ->
         Logger.info "Deploying: #{inspect conn.params}"
-        Dockup.DeployJob.spawn_process(params)
+        deploy_job.spawn_process(params)
         send_resp(conn, 200, "OK")
     end
   end

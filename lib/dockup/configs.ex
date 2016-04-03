@@ -17,6 +17,7 @@ defmodule Dockup.Configs do
 
   def workdir do
     dir = System.get_env("DOCKUP_WORKDIR") || Application.fetch_env!(:dockup, :workdir)
+    File.mkdir_p dir
     case File.exists?(dir) do
       true -> dir
       _ -> raise "Invalid workdir"

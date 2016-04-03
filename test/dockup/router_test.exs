@@ -9,29 +9,35 @@ defmodule Dockup.RouterTest do
   end
 
   test "returns 400 when parameters are wrong" do
-    :meck.new(Dockup.DeployJob)
-    :meck.expect(Dockup.DeployJob, :spawn_process, fn (_args) -> :ok end)
+    defmodule UnusedFakeDeployJob do
+      def spawn_process(_args) do
+        raise "This function should not be called"
+      end
+    end
 
-    conn = conn(:post, "/deploy") |> call
+    conn = conn(:post, "/deploy")
+    |> assign(:deploy_job, FakeDeployJob)
+    |> call
     assert conn.status == 400
     assert conn.resp_body == "Bad request"
-
-    refute :meck.called(Dockup.DeployJob, :spawn_process, [:_])
-    :meck.validate(Dockup.DeployJob)
-    :meck.unload(Dockup.DeployJob)
   end
 
   test "returns 200 OK when parameters are alright" do
     params = %{"repository" => "https://github.com/code-mancers/project.git", "branch" => "branch", "callback_url" => "http://callback_url"}
-    :meck.new(Dockup.DeployJob)
-    :meck.expect(Dockup.DeployJob, :spawn_process, fn (_args) -> :ok end)
+    defmodule FakeDeployJob do
+      def spawn_process(args) do
+        send self(), args
+      end
+    end
 
-    conn = conn(:post, "/deploy", params) |> call
+    conn = conn(:post, "/deploy", params)
+    |> assign(:deploy_job, FakeDeployJob)
+    |> call
+
+    receive do
+      args -> assert args == params
+    end
     assert conn.status == 200
     assert conn.resp_body == "OK"
-
-    assert :meck.called(Dockup.DeployJob, :spawn_process, [params])
-    :meck.validate(Dockup.DeployJob)
-    :meck.unload(Dockup.DeployJob)
   end
 end
