@@ -23,10 +23,13 @@ defmodule Dockup.RouterTest do
   end
 
   test "returns 200 OK when parameters are alright" do
-    params = %{"repository" => "https://github.com/code-mancers/project.git", "branch" => "branch", "callback_url" => "http://callback_url"}
+    repository = "https://github.com/code-mancers/project.git"
+    branch = "branch"
+    callback_url = "http://callbackrl"
+    params = %{"repository" => repository, "branch" => branch, "callback_url" => callback_url}
     defmodule FakeDeployJob do
       def spawn_process(args) do
-        send self(), args
+        send self, args
       end
     end
 
@@ -35,7 +38,7 @@ defmodule Dockup.RouterTest do
     |> call
 
     receive do
-      args -> assert args == params
+      args -> assert args == {repository, branch, {:webhook_callback, callback_url}}
     end
     assert conn.status == 200
     assert conn.resp_body == "OK"
