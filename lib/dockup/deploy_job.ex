@@ -12,10 +12,9 @@ defmodule Dockup.DeployJob do
 
     # Read config
     # if config can't be read, do the following
-    project.auto_detect_project_type(project_id)
+    urls = project.auto_detect_project_type(project_id)
     |> deploy(project_id, nginx_config, container)
 
-    urls = %{}
     success_callback(callback, repository, branch, urls)
   rescue
     e in DockupException ->
@@ -25,8 +24,9 @@ defmodule Dockup.DeployJob do
 
   defp deploy(:static_site, project_id, nginx_config, container) do
     Logger.info "Deploying static site #{project_id}"
-    nginx_config.write_config(:static_site, project_id)
+    url = nginx_config.write_config(:static_site, project_id)
     container.reload_nginx
+    url
   end
 
   defp deploy(_, app_id, _, _) do
