@@ -64,7 +64,8 @@ defmodule Dockup.Router do
   end
 
   defp parse_deploy_params(conn) do
-    %{"repository" => _a, "branch" => _b, "callback_url" => _c} = conn.params
+    %{"repository" => repo, "branch" => branch, "callback_url" => callback_url} = conn.params
+    {repo, branch, {Dockup.Callbacks.Webhook, callback_url}}
   rescue
     MatchError ->
       :error

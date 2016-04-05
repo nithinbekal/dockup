@@ -16,9 +16,14 @@ defmodule Dockup.DeployJobTest do
       def reload_nginx, do: send self, :nginx_reloaded
     end
 
-    Dockup.DeployJob.perform("fake_repo", "fake_branch", "fake_callback_url",
+    defmodule FakeCallback do
+      def deployment_success(_repo, _branch, _urls, callback_url), do: send self, {:callback_triggered, callback_url}
+    end
+
+    Dockup.DeployJob.perform("fake_repo", "fake_branch", {FakeCallback, "fake_callback_url"},
                              FakeProject, FakeNginxConfig, FakeContainer)
     assert_received :nginx_config_added
     assert_received :nginx_reloaded
+    assert_received {:callback_triggered, "fake_callback_url"}
   end
 end
