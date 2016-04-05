@@ -6,12 +6,12 @@ use Mix.Config
 config :dockup,
   port: "8000",
   bind: "0.0.0.0",
-  workdir: "./workdir",
+  workdir: "workdir",
   cache_container: "cache",
   cache_volume: "/cache",
   github_webhook_secret: nil,
   command_module: Dockup.ShellCommand,
-  nginx_config_dir: "./nginx_config_dir",
+  nginx_config_dir: "nginx_config_dir",
   domain: "127.0.0.1.xip.io",
   start_server: true
 #

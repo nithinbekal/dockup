@@ -38,7 +38,7 @@ defmodule Dockup.RouterTest do
     |> call
 
     receive do
-      args -> assert args == {repository, branch, {:webhook_callback, callback_url}}
+      args -> assert args == {repository, branch, {Dockup.Callbacks.Webhook, callback_url}}
     end
     assert conn.status == 200
     assert conn.resp_body == "OK"

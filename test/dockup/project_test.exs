@@ -16,15 +16,15 @@ defmodule Dockup.ProjectTest do
     assert id == "code-mancers/dockup/master"
   end
 
-  test "workdir of a project is <Dockup workdir>/<project_id>" do
-    assert Dockup.Project.workdir("foo/test/baz") == "#{Dockup.Configs.workdir}/foo/test/baz"
+  test "project_dir of a project is <Dockup workdir>/<project_id>" do
+    assert Dockup.Project.project_dir("foo/test/baz") == "#{Dockup.Configs.workdir}/foo/test/baz"
   end
 
   # Remove mocking in favor of dependency injection and make this test pass
-  test "clone_repository clones the given branch of git repository into workdir" do
+  test "clone_repository clones the given branch of git repository into project_dir" do
     repository = "https://github.com/code-mancers/dockup.git"
     branch = "master"
-    workdir = Dockup.Project.project_id(repository, branch) |> Dockup.Project.workdir
+    project_dir = Dockup.Project.project_id(repository, branch) |> Dockup.Project.project_dir
 
     defmodule GitCloneCommand do
       def run(cmd, args) do
@@ -33,7 +33,7 @@ defmodule Dockup.ProjectTest do
       end
     end
     Dockup.Project.clone_repository(repository, branch, GitCloneCommand)
-    [cmd | args] = String.split("git clone --branch=master --depth=1 #{repository} #{workdir}")
+    [cmd | args] = String.split("git clone --branch=master --depth=1 #{repository} #{project_dir}")
 
     receive do
       {command, arguments} ->
@@ -62,7 +62,7 @@ defmodule Dockup.ProjectTest do
 
   test "auto_detect_project_type returns :static_site if index.html is found" do
     project_id = "auto/detect/static"
-    project_dir = Dockup.Project.workdir project_id
+    project_dir = Dockup.Project.project_dir project_id
     File.mkdir_p project_dir
     File.touch "#{project_dir}/index.html"
 
@@ -72,7 +72,7 @@ defmodule Dockup.ProjectTest do
 
   test "auto_detect_project_type returns :unknown if auto detection fails" do
     project_id = "auto/detect/none"
-    project_dir = Dockup.Project.workdir project_id
+    project_dir = Dockup.Project.project_dir project_id
     File.mkdir_p project_dir
 
     assert Dockup.Project.auto_detect_project_type(project_id) == :unknown

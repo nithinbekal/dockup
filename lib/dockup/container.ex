@@ -31,12 +31,17 @@ defmodule Dockup.Container do
         Logger.info "Trying to pull nginx image"
         {_output, 0} = command.run("docker", ["run", "--name", "nginx",
           "-d", "-p", "80:80",
-          "-v", "#{Dockup.Configs.nginx_config_dir}:/etc/nginx/sites-enabled",
+          "-v", "#{Dockup.Configs.nginx_config_dir}:/etc/nginx/conf.d",
           "-v", "#{Dockup.Configs.workdir}:/dockup:ro",
           "nginx:1.8"])
       end
       Logger.info "Nginx pulled and started"
     end
+  end
+
+  def reload_nginx(command \\ Dockup.Command) do
+    Logger.info "Reloading nxinx config"
+    {_out, 0} = command.run("docker", ["kill", "-s", "HUP", "nginx"])
   end
 
   def check_docker_version(command \\ Dockup.Command) do
