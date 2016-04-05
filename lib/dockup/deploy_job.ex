@@ -17,7 +17,7 @@ defmodule Dockup.DeployJob do
 
     success_callback(callback, repository, branch, urls)
   rescue
-    e in DockupException ->
+    e ->
       Logger.error e.message
       error_callback(callback, repository, branch, e.message)
   end
@@ -30,7 +30,7 @@ defmodule Dockup.DeployJob do
   end
 
   defp deploy(_, app_id, _, _) do
-    Logger.error "Don't know how to deploy #{app_id}"
+    raise DockupException, "Don't know how to deploy #{app_id}"
   end
 
   # Callback handlers
