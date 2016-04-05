@@ -31,7 +31,7 @@ defmodule Dockup.Container do
         Logger.info "Trying to pull nginx image"
         {_output, 0} = command.run("docker", ["run", "--name", "nginx",
           "-d", "-p", "80:80",
-          "-v", "#{Dockup.Configs.nginx_config_dir}:/etc/nginx/sites-enabled",
+          "-v", "#{Dockup.Configs.nginx_config_dir}:/etc/nginx/conf.d",
           "-v", "#{Dockup.Configs.workdir}:/dockup:ro",
           "nginx:1.8"])
       end

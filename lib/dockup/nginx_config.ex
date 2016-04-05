@@ -1,17 +1,13 @@
 defmodule Dockup.NginxConfig do
+  require Logger
   def static_site_config(project_id, url) do
     """
     server {
       listen 80;
 
+      server_name #{url};
       root /dockup/#{project_id};
       index index.html;
-
-      server_name #{url};
-
-      location / {
-        try_files $uri $uri/ =404;
-      }
     }
     """
   end
@@ -21,11 +17,13 @@ defmodule Dockup.NginxConfig do
   end
 
   def config_file(project_id) do
-    Path.join(Dockup.Configs.nginx_config_dir, hash(project_id))
+    Path.join(Dockup.Configs.nginx_config_dir, "#{hash(project_id)}.conf")
   end
 
   def write_config(:static_site, project_id, haikunator \\ Dockup.Haikunator) do
-    config = static_site_config(project_id, haikunator.haikunated_url)
+    url = haikunator.haikunated_url
+    Logger.info "Writing nginx config to serve #{project_id} at http://#{url}"
+    config = static_site_config(project_id, url)
     File.write(config_file(project_id), config)
   end
 end

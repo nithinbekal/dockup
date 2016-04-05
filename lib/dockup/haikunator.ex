@@ -1,6 +1,6 @@
 defmodule Dockup.Haikunator do
   def haiku_subdomain(adjectives, nouns) do
-    random_number_as_string = Enum.random(0..9999) |> Integer.to_string |> String.rjust 4, ?0
+    random_number_as_string = Enum.random(0..9999) |> Integer.to_string |> String.rjust(4, ?0)
     "#{Enum.random(adjectives)}-#{Enum.random(nouns)}-#{random_number_as_string}"
   end
 

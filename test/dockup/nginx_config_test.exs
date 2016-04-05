@@ -12,14 +12,9 @@ defmodule Dockup.NginxConfigTest do
     server {
       listen 80;
 
+      server_name haikunated_url;
       root /dockup/hello/world;
       index index.html;
-
-      server_name haikunated_url;
-
-      location / {
-        try_files $uri $uri/ =404;
-      }
     }
     """
     File.rm_rf Dockup.Configs.nginx_config_dir

@@ -3,8 +3,7 @@
 
 Vagrant.configure(2) do |config|
 
-  config.vm.network "forwarded_port", guest: 80, host: 2000
-  config.vm.network "forwarded_port", guest: 8000, host: 2001
+  config.vm.network "private_network", ip: "192.168.88.88"
 
   config.vm.box = "hashicorp/precise64"
   config.vm.provision "shell", inline: <<-SHELL
