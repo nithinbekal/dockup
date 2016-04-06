@@ -1,5 +1,5 @@
 defmodule Dockup.Callbacks.WebhookTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   defmodule FakeHttp do
     def send_request(callback_url, body) do

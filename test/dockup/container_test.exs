@@ -1,5 +1,5 @@
 defmodule Dockup.ContainerTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
   test "create_cache_container creates a cache container if it does not exist" do

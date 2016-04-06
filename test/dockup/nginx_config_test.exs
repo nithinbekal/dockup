@@ -1,5 +1,5 @@
 defmodule Dockup.NginxConfigTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "write_config for static site writes an nginx config for static sites" do
     defmodule FakeHaikunator do

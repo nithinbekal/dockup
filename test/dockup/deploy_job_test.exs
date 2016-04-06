@@ -1,5 +1,5 @@
 defmodule Dockup.DeployJobTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "deploying static site writes nginx config and reloads nginx container" do
     defmodule FakeProject do

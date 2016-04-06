@@ -1,5 +1,5 @@
 defmodule Dockup.HaikunatorTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "haiku_subdomain returns a haikunated subdomain in the format <adjective>-<noun>-<4 digits>" do
     subdomain = Dockup.Haikunator.haiku_subdomain(["arrogant"], ["man"])

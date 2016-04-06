@@ -1,5 +1,5 @@
 defmodule Dockup.ProjectIndexTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "it should be possible to write and read project properties" do
     Dockup.ProjectIndex.start("test_dets")
