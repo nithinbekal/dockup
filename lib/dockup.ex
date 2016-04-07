@@ -20,16 +20,4 @@ defmodule Dockup do
     opts = [strategy: :one_for_one, name: Dockup.Supervisor]
     Supervisor.start_link(children, opts)
   end
-
-  defp plug_router_worker do
-    if Application.get_env(:dockup, :start_server, true) do
-      [worker(Dockup.Router, [], function: :start_server)]
-    else
-      []
-    end
-  end
-
-  defp project_index_store_worker do
-    [worker(Dockup.ProjectIndex, [], function: :start)]
-  end
 end
