@@ -35,7 +35,7 @@ defmodule Dockup.ProjectIndex do
   end
 
   def handle_call({:read, project_id}, _from, dets) do
-    {project_id, properties} = :dets.lookup(dets, project_id) |> List.first
+    {_project_id, properties} = :dets.lookup(dets, project_id) |> List.first
     {:reply, properties, dets}
   rescue
     _error ->

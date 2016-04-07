@@ -6,7 +6,14 @@ defmodule Dockup do
   # for more information on OTP Applications
   def start(_type, _args) do
 
-    children = plug_router_worker ++ project_index_store_worker
+    children = if Application.get_env(:dockup, :start_server, true) do
+      [
+        worker(Dockup.Router, [], function: :start_server),
+        worker(Dockup.ProjectIndex, [], function: :start)
+      ]
+    else
+      []
+    end
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options

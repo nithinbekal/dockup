@@ -20,4 +20,14 @@ defmodule Dockup.ProjectIndexTest do
 
     File.rm_rf "test_dets"
   end
+
+  test ".all returns the properties of all projects" do
+    Dockup.ProjectIndex.start("test_dets")
+
+    Dockup.ProjectIndex.write("project_1", %{hello: :world})
+    Dockup.ProjectIndex.write("project_2", %{foo: :bar})
+    assert Dockup.ProjectIndex.all == [%{foo: :bar}, %{hello: :world}]
+
+    File.rm_rf "test_dets"
+  end
 end
