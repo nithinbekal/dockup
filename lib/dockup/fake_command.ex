@@ -13,7 +13,7 @@ defmodule Dockup.FakeCommand do
     },
 
     "git" => %{
-      ["clone", "--branch=master", "--depth=1", "https://github.com/code-mancers/project.git", "./workdir/code-mancers/project/master"] => {"", 0}
+      ["clone", "--branch=master", "--depth=1", "https://github.com/code-mancers/project.git", "workdir/code-mancers/project/master"] => {"", 0}
     }
   }
 

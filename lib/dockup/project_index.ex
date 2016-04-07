@@ -13,6 +13,10 @@ defmodule Dockup.ProjectIndex do
     GenServer.call(__MODULE__, {:read, project_id})
   end
 
+  def all do
+    GenServer.call(__MODULE__, :all)
+  end
+
   # Below are used by the GenServer behavior, not intended to be used
   # directly. Use the above public APIs only.
 
@@ -25,11 +29,24 @@ defmodule Dockup.ProjectIndex do
     {:noreply, dets}
   end
 
+  def handle_cast({:delete, project_id}, dets) do
+    :ok = :dets.delete(dets, project_id)
+    {:noreply, dets}
+  end
+
   def handle_call({:read, project_id}, _from, dets) do
     {project_id, properties} = :dets.lookup(dets, project_id) |> List.first
     {:reply, properties, dets}
   rescue
     _error ->
       {:reply, nil, dets}
+  end
+
+  def handle_call(:all, _from, dets) do
+    props = :dets.foldl(fn({_pid, props}, acc) -> [props | acc] end, [], dets)
+    {:reply, props, dets}
+  rescue
+    _error ->
+      {:reply, [], dets}
   end
 end

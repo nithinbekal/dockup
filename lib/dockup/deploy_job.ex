@@ -15,6 +15,8 @@ defmodule Dockup.DeployJob do
     urls = project.auto_detect_project_type(project_id)
     |> deploy(project_id, nginx_config, container)
 
+    Dockup.ProjectIndex.write(project_id,
+      %{urls: urls, localtime: localtime, repository: repository, branch: branch})
     success_callback(callback, repository, branch, urls)
   rescue
     e ->
@@ -36,9 +38,17 @@ defmodule Dockup.DeployJob do
   # Callback handlers
   defp success_callback({callback_module, callback_args}, repository, branch, urls) do
     callback_module.deployment_success(repository, branch, urls, callback_args)
+  rescue
+    e ->
+      Logger.error "An error occurred in the success callback: #{e.message}"
   end
 
   defp error_callback({callback_module, callback_args}, repository, branch, reason) do
     callback_module.deployment_failure(repository, branch, reason, callback_args)
+  end
+
+  defp localtime do
+    {{year, month, day}, {hour, minute, second}} = :calendar.local_time
+    "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second}"
   end
 end
