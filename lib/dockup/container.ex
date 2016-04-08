@@ -16,6 +16,7 @@ defmodule Dockup.Container do
   end
 
   def run_nginx_container(command \\ Dockup.Command) do
+    File.write!("#{Dockup.Configs.nginx_config_dir}/default.conf", Dockup.NginxConfig.default_config)
     {status, exit_code} = command.run("docker", ["inspect", "--format='{{.State.Running}}'", "nginx"])
     if status == "false" do
       Logger.info "Nginx container seems to be down. Trying to start."
