@@ -13,7 +13,8 @@ config :dockup,
   command_module: Dockup.ShellCommand,
   nginx_config_dir: "nginx_config_dir",
   domain: "127.0.0.1.xip.io",
-  start_server: true
+  start_server: true,
+  project_index_file: "projects.dets"
 #
 # And access this configuration in your application as:
 #

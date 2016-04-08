@@ -30,7 +30,10 @@ defmodule Dockup.Router do
   end
 
   get "/status" do
-    send_resp(conn, 200, "This will return a list of all live deployments") |> halt
+    response = Dockup.ProjectIndex.all |> Poison.encode!
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, response)
   end
 
   post "/destroy" do

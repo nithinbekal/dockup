@@ -1,5 +1,5 @@
 defmodule Dockup.ProjectTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "project_id is of the format org_name/repo_name/branch for github https url" do
     id = Dockup.Project.project_id("https://github.com/code-mancers/dockup.git", "master")

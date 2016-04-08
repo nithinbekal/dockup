@@ -41,6 +41,10 @@ defmodule Dockup.Configs do
     System.get_env("DOCKUP_DOMAIN") || Application.fetch_env!(:dockup, :domain)
   end
 
+  def project_index_file do
+    System.get_env("DOCKUP_PROJECT_INDEX_FILE") || Application.fetch_env!(:dockup, :project_index_file)
+  end
+
   defp ensure_dir_exists(dir) do
     File.mkdir_p dir
     case File.exists?(dir) do
