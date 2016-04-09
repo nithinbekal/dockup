@@ -6,6 +6,7 @@ defmodule Dockup.DeployJobTest do
       def project_id("fake_repo", "fake_branch"), do: "fake_project_id"
       def clone_repository(_repo, _branch), do: :ok
       def auto_detect_project_type("fake_project_id"), do: :static_site
+      def wait_till_up(_urls), do: :ok
     end
 
     defmodule FakeNginxConfig do

@@ -16,9 +16,9 @@ defmodule Dockup.DeployJob do
     urls = project.auto_detect_project_type(project_id)
     |> deploy(project_id, nginx_config, container)
 
+    project.wait_till_up(urls)
     project_index.write(project_id,
       %{urls: urls, localtime: localtime, repository: repository, branch: branch})
-
     success_callback(callback, repository, branch, urls)
   rescue
     error in MatchError ->
