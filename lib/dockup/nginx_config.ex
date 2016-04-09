@@ -12,6 +12,21 @@ defmodule Dockup.NginxConfig do
     """
   end
 
+  def default_config do
+    """
+    server {
+      listen 80 default_server;
+      listen [::]:80 default_server ipv6only=on;
+      listen 443 default_server ssl;
+      listen [::]:443 default_server ssl ipv6only=on;
+
+      return 404;
+
+      server_name _ ;
+    }
+    """
+  end
+
   def hash(project_id) do
     :crypto.hash(:sha, project_id) |> Base.encode16
   end

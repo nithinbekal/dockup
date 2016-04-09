@@ -91,8 +91,11 @@ defmodule Dockup.ContainerTest do
     end
 
     logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxCommand) end)
+    assert File.read!(Dockup.Configs.nginx_config_dir <> "/default.conf") == Dockup.NginxConfig.default_config
     assert logs =~ "Nginx container seems to be down. Trying to start"
     assert logs =~ "Nginx started"
+
+    File.rm! Dockup.Configs.nginx_config_dir <> "/default.conf"
   end
 
   test "run_nginx_container pulls and starts nginx container if it does not exist" do
@@ -110,6 +113,8 @@ defmodule Dockup.ContainerTest do
     assert logs =~ "Nginx container not found."
     assert logs =~ "Trying to pull nginx image"
     assert logs =~ "Nginx pulled and started"
+
+    File.rm! Dockup.Configs.nginx_config_dir <> "/default.conf"
   end
 
   test "reload_nginx sends a kill signal to nginx docker container" do
