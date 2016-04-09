@@ -1,5 +1,6 @@
 defmodule Dockup.ProjectTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureLog
 
   test "project_id is of the format org_name/repo_name/branch for github https url" do
     id = Dockup.Project.project_id("https://github.com/code-mancers/dockup.git", "master")
@@ -77,5 +78,23 @@ defmodule Dockup.ProjectTest do
 
     assert Dockup.Project.auto_detect_project_type(project_id) == :unknown
     File.rm_rf Dockup.Configs.workdir <> "/auto"
+  end
+
+  test "wait_till_up waits until http response of url is 200" do
+    Agent.start_link(fn -> 1 end, name: RetryCount)
+    defmodule FakeHttp do
+      def get_status("dummy_url") do
+        count = Agent.get(RetryCount, fn count -> count end)
+        Agent.update(RetryCount, fn count -> count+1 end)
+        if count == 3, do: 200, else: 404
+      end
+    end
+
+    logs = capture_log(fn -> Dockup.Project.wait_till_up(%{"80" => "dummy_url"}, FakeHttp, 0) end)
+    assert logs =~ "Attempt 1 failed"
+    assert logs =~ "Attempt 2 failed"
+    refute logs =~ "Attempt 3 failed"
+
+    Agent.stop(RetryCount)
   end
 end

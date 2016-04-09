@@ -1,4 +1,5 @@
 defmodule Dockup.Retry do
+  require Logger
   # Credit for this code goes to safwank/ElixirRetry library
   defmacro retry({ :in, _, [retries, sleep] }, do: block) do
     quote do
@@ -8,6 +9,7 @@ defmodule Dockup.Retry do
             unquote(block)
           rescue
             e ->
+              Logger.info "Attempt #{attempt} failed because of error: #{inspect e}"
               :timer.sleep(unquote(sleep))
               self.(attempt + 1, self)
           end

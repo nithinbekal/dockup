@@ -18,8 +18,12 @@ defmodule Dockup.DeployJob do
 
     project_index.write(project_id,
       %{urls: urls, localtime: localtime, repository: repository, branch: branch})
+
     success_callback(callback, repository, branch, urls)
   rescue
+    error in MatchError ->
+      Logger.error (inspect error)
+      error_callback(callback, repository, branch, (inspect error))
     e ->
       Logger.error e.message
       error_callback(callback, repository, branch, e.message)
