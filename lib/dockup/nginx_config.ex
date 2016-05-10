@@ -40,6 +40,6 @@ defmodule Dockup.NginxConfig do
     Logger.info "Writing nginx config to serve #{project_id} at http://#{url}"
     config = static_site_config(project_id, url)
     File.write(config_file(project_id), config)
-    url
+    %{"80" => url}
   end
 end

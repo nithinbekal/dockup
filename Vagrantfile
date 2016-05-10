@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.network "private_network", ip: "192.168.88.88"
 
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "ubuntu/trusty64"
   config.vm.provision "shell", inline: <<-SHELL
     echo 'LC_ALL="en_US.UTF-8"'  >  /etc/default/locale
     cd /home/vagrant
@@ -23,7 +23,7 @@ Vagrant.configure(2) do |config|
     sudo usermod -aG docker vagrant
 
     # Install docker compose
-    sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.6.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
+    sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.7.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
     sudo chmod +x /usr/local/bin/docker-compose
   SHELL
 

@@ -1,5 +1,6 @@
 defmodule Dockup.Project do
   require Logger
+  import Dockup.Retry
 
   def clone_repository(repository, branch, command \\ Dockup.Command) do
     project_dir = project_id(repository, branch) |> project_dir
@@ -34,6 +35,25 @@ defmodule Dockup.Project do
     end
     File.cd cwd
     project_type
+  end
+
+  # Waits until the urls all return expected HTTP status.
+  # Currently, assuming that URLs are for static sites
+  # and they return 200.
+  def wait_till_up(urls, http \\ __MODULE__, interval \\ 3000) do
+    urls
+    |> Enum.map(fn {_port, url} -> {url, 200}  end)
+    |> Enum.each(fn {url, response} ->
+      # Retry 10 times in an interval of 3 seconds
+      retry 10 in interval do
+        ^response = http.get_status(url)
+      end
+    end)
+    Logger.info "URLs #{inspect urls} seem up because they respond with 200."
+  end
+
+  def get_status(url) do
+    HTTPotion.get(url).status_code
   end
 
   defp parse_repo_from_git_url(git_url) do
