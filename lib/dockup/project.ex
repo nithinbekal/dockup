@@ -49,6 +49,7 @@ defmodule Dockup.Project do
         ^response = http.get_status(url)
       end
     end)
+    Logger.info "URLs #{inspect urls} seem up because they respond with 200."
   end
 
   def get_status(url) do
