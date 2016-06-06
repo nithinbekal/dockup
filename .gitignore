@@ -3,7 +3,3 @@
 /deps
 erl_crash.dump
 *.ez
-/.vagrant
-/nginx_config_dir
-/workdir
-/projects.dets
