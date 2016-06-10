@@ -6,14 +6,11 @@ config :dockup_ui, DockupUi.Endpoint,
   http: [port: 4001],
   server: false
 
-# Print only warnings and errors during test
-config :logger, level: :warn
-
 # Configure your database
 config :dockup_ui, DockupUi.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  #username: "postgres",
+  #password: "postgres",
   database: "dockup_ui_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
