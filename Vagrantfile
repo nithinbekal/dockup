@@ -3,7 +3,7 @@
 
 Vagrant.configure(2) do |config|
 
-  config.vm.network "private_network", ip: "192.168.88.88"
+  config.vm.network "forwarded_port", guest: 4000, host: 4000
 
   config.vm.box = "ubuntu/trusty64"
   config.vm.provision "shell", inline: <<-SHELL
