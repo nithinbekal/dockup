@@ -20,7 +20,7 @@ Other goals:
 Clone the repo and run:
 
     mix deps.get
-    iex -S mix
+    iex -S mix phoenix.server
 
 ### Using Vagrant for testing
 
