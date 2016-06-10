@@ -2,33 +2,16 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-# All configurations are assumed to be strings
-config :dockup,
-  port: "8000",
-  bind: "0.0.0.0",
-  workdir: "workdir",
-  cache_container: "cache",
-  cache_volume: "/cache",
-  github_webhook_secret: nil,
-  command_module: Dockup.ShellCommand,
-  nginx_config_dir: "nginx_config_dir",
-  domain: "127.0.0.1.xip.io",
-  start_server: true,
-  project_index_file: "projects.dets"
-#
-# And access this configuration in your application as:
-#
-#     Application.get_env(:dockup, :key)
-#
-# Or configure a 3rd-party app:
-#
-#     config :logger, level: :info
-#
+# By default, the umbrella project as well as each child
+# application will require this configuration file, ensuring
+# they all use the same configuration. While one could
+# configure all applications here, we prefer to delegate
+# back to each application for organization purposes.
+import_config "../apps/*/config/config.exs"
 
-# It is also possible to import configuration files, relative to this
-# directory. For example, you can emulate configuration per environment
-# by uncommenting the line below and defining dev.exs, test.exs and such.
-# Configuration from the imported file will override the ones defined
-# here (which is why it is important to import them last).
+# Sample configuration (overrides the imported configuration above):
 #
-import_config "#{Mix.env}.exs"
+#     config :logger, :console,
+#       level: :info,
+#       format: "$date $time [$level] $metadata$message\n",
+#       metadata: [:user_id]

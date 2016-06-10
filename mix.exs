@@ -1,23 +1,11 @@
-defmodule Dockup.Mixfile do
+defmodule DockupUmbrella.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :dockup,
-     version: "0.0.1",
-     elixir: "~> 1.1",
+    [apps_path: "apps",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
-  end
-
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
-  def application do
-    [applications: [:logger, :cowboy, :plug, :gh_webhook_plug, :httpotion, :poison],
-     mod: {Dockup, []},
-     env: [start_server: true]
-   ]
   end
 
   # Dependencies can be Hex packages:
@@ -28,15 +16,11 @@ defmodule Dockup.Mixfile do
   #
   #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
   #
-  # Type "mix help deps" for more examples and options
+  # Type "mix help deps" for more examples and options.
+  #
+  # Dependencies listed here are available only for this project
+  # and cannot be accessed from applications inside the apps folder
   defp deps do
-    [
-      {:cowboy, "~>1.0.4"},
-      {:plug, "~>1.1.0"},
-      {:gh_webhook_plug, "~> 0.0.1"},
-      {:exrm, "~> 1.0.0-rc7"},
-      {:poison, "~>2.1.0"},
-      {:httpotion, "~> 2.2.0"}
-    ]
+    []
   end
 end
