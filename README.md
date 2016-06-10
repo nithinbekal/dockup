@@ -22,6 +22,18 @@ Clone the repo and run:
     mix deps.get
     iex -S mix phoenix.server
 
+You can access Dockup UI at http://localhost:4000.
+
+### Development on OSX
+
+If you are running this on OSX, unless you have docker CLI available in the
+development environment, you need to enable dry run mode in order to start
+Dockup. Run:
+
+    # Use this instead of iex -S mix phoenix.server
+    DOCKUP_DRY_RUN=true iex -S mix phoenix.server
+
+
 ### Using Vagrant for testing
 
 A `Vagrantfile` is checked in which will provision an ubuntu machine with
