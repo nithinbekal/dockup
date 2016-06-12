@@ -19,8 +19,9 @@ defmodule DockupUi.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", DockupUi do
-  #   pipe_through :api
-  # end
+  scope "/api", DockupUi do
+    pipe_through :api
+
+    resources "/deployments", DeploymentController, only: [:create, :index, :show]
+  end
 end

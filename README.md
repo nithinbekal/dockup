@@ -59,5 +59,5 @@ Refer `config/config.exs` to see the list of configurations
 This API endpoint is used to deploy a dockerized app.
 
 ```
-curl -XPOST  -d '{"repository":"https://github.com/code-mancers/project.git","branch":"master","callback_url":"fake_callback"}' -H "Content-Type: application/json" http://localhost:8000/deploy
+curl -XPOST  -d '{"git_url":"https://github.com/code-mancers/project.git","branch":"master","callback_url":"fake_callback"}' -H "Content-Type: application/json" http://localhost:4000/api/deployment
 ```
