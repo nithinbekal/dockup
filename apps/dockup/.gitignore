@@ -6,4 +6,4 @@ erl_crash.dump
 /.vagrant
 /nginx_config_dir
 /workdir
-/projects.dets
+/mix.lock
