@@ -28,6 +28,7 @@ defmodule DockupUi.Mixfile do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
+  defp elixirc_paths(:dev), do: ["lib", "web", "test/support/factory.ex"]
   defp elixirc_paths(_),     do: ["lib", "web"]
 
   # Specifies your project dependencies.
@@ -40,6 +41,7 @@ defmodule DockupUi.Mixfile do
      {:phoenix_html, "~> 2.4"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.9"},
+     {:ex_machina, "~> 0.6.1", only: [:test, :dev]},
      {:cowboy, "~> 1.0"}]
   end
 

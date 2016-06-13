@@ -6,8 +6,7 @@ defmodule Dockup.DeployJob do
   end
 
   def perform(repository, branch, callback, project \\ Dockup.Project,
-               nginx_config \\ Dockup.NginxConfig, container \\ Dockup.Container,
-               project_index \\ Dockup.ProjectIndex) do
+               nginx_config \\ Dockup.NginxConfig, container \\ Dockup.Container) do
     project_id = project.project_id(repository, branch)
     project.clone_repository(repository, branch)
 
@@ -17,8 +16,6 @@ defmodule Dockup.DeployJob do
     |> deploy(project_id, nginx_config, container)
 
     project.wait_till_up(urls)
-    project_index.write(project_id,
-      %{urls: urls, localtime: localtime, repository: repository, branch: branch})
     success_callback(callback, repository, branch, urls)
   rescue
     error in MatchError ->

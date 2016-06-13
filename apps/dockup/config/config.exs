@@ -12,9 +12,7 @@ config :dockup,
   github_webhook_secret: nil,
   command_module: Dockup.ShellCommand,
   nginx_config_dir: "nginx_config_dir",
-  domain: "127.0.0.1.xip.io",
-  start_server: true,
-  project_index_file: "projects.dets"
+  domain: "127.0.0.1.xip.io"
 #
 # And access this configuration in your application as:
 #
