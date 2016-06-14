@@ -12,11 +12,11 @@ class DeploymentForm extends Component {
     }
   }
 
-  handleUserNameChange = (event) => {
+  handleUserNameChange(event) {
     this.setState({username: event.target.value});
   }
 
-  handleRepositoryChange = (event) => {
+  handleRepositoryChange(event) {
     this.setState({repository: event.target.value});
   }
 
@@ -38,8 +38,8 @@ class DeploymentForm extends Component {
   render() {
     return (
       <div>https://github.com/
-        <input name="username" onChange={this.handleUserNameChange}/>/
-        <input name="repository" onChange={this.handleRepositoryChange} />
+        <input name="username" onChange={this.handleUserNameChange.bind(this)}/>/
+        <input name="repository" onChange={this.handleRepositoryChange.bind(this)} />
         <button name="deploy" onClick={this.handleClick.bind(this)} disabled={(!this.state.username || !this.state.repository)}>Deploy</button>
         <br />
         <div>{this.displayHelpText()}</div>
