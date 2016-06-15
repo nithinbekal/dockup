@@ -29,10 +29,9 @@ class DeploymentForm extends Component {
   }
 
   handleClick(e) {
-    let newElement = {name: `${this.state.username}/${this.state.repository}`, logs: '111', url: "http://one.com"};
-    let deploymentsArray = this.state.deployments;
-    deploymentsArray.push(newElement);
-    this.setState({deployments: deploymentsArray}, this.clearInput);
+    const newElement = {name: `${this.state.username}/${this.state.repository}`, logs: '111', url: "http://one.com"};
+    const deploymentsArray = this.state.deployments;
+    this.setState({deployments: deploymentsArray.concat(newElement)}, this.clearInput);
   }
 
   render() {
