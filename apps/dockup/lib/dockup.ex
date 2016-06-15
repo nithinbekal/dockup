@@ -2,8 +2,12 @@ defmodule Dockup do
   def run_preflight_checks do
     # Check if workdir exists
     Dockup.Configs.workdir
-    # Check if nginx_config_dir exists
+    # Ensure we know the workdir on host
+    Dockup.Configs.workdir_on_host
+    # Check if nginx_config_dir exists inside dockup container
     Dockup.Configs.nginx_config_dir
+    # Ensure we know the nginx config dir on host
+    Dockup.Configs.nginx_config_dir_on_host
     # Ensure "DOCKUP_DOMAIN" config is set
     Dockup.Configs.domain
 

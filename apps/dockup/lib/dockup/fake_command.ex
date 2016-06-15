@@ -6,6 +6,7 @@ defmodule Dockup.FakeCommand do
       ["inspect", "--format='{{.State.Running}}'", "nginx"] => {"true", 0},
       ["-v"] => {"Docker version 1.8.1, build d12ea79", 0},
       ["kill", "-s", "HUP", "nginx"] => {"", 0},
+      ["inspect", "--format='{{ range .Mounts }}{{ if eq .Destination \"workdir\" }}{{ .Source }}{{ end }}{{ end }}'", "fake_docker_container_id"] => {"/fake_work_dir_on_host", 0},
     },
 
     "docker-compose" => %{
@@ -14,7 +15,11 @@ defmodule Dockup.FakeCommand do
 
     "git" => %{
       ["clone", "--branch=master", "--depth=1", "https://github.com/code-mancers/project.git", "workdir/code-mancers/project/master"] => {"", 0}
-    }
+    },
+
+    "hostname" => %{
+      [] => {"fake_docker_container_id", 0}
+    },
   }
 
   def run(command, args) do

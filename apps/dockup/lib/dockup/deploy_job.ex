@@ -1,19 +1,19 @@
 defmodule Dockup.DeployJob do
   require Logger
 
-  def spawn_process({repository, branch, callback}) do
-    spawn(fn -> perform(repository, branch, callback) end)
+  def spawn_process({id, repository, branch, callback}) do
+    spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
-  def perform(repository, branch, callback, project \\ Dockup.Project,
-               nginx_config \\ Dockup.NginxConfig, container \\ Dockup.Container) do
-    project_id = project.project_id(repository, branch)
-    project.clone_repository(repository, branch)
+  def perform(project_id, repository, branch, callback, project \\ Dockup.Project,
+               config_generator \\ Dockup.ConfigGenerator, container \\ Dockup.Container) do
+    #project_id = project.project_id(repository, branch)
+    project.clone_repository(project_id, repository, branch)
 
     # Read config
     # if config can't be read, do the following
-    urls = project.auto_detect_project_type(project_id)
-    |> deploy(project_id, nginx_config, container)
+    urls = project.project_type(project_id)
+    |> deploy(project_id, config_generator, container)
 
     project.wait_till_up(urls)
     success_callback(callback, repository, branch, urls)
@@ -26,9 +26,11 @@ defmodule Dockup.DeployJob do
       error_callback(callback, repository, branch, e.message)
   end
 
-  defp deploy(:static_site, project_id, nginx_config, container) do
+  defp deploy(:static_site, project_id, config_generator, container) do
     Logger.info "Deploying static site #{project_id}"
-    url = nginx_config.write_config(:static_site, project_id)
+    Dockup.ConfigGenerator.generate(:static_site, project_id)
+    Dockup.Container.start(project_id)
+    url = ""
     container.reload_nginx
     url
   end

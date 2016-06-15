@@ -1,6 +1,7 @@
 defmodule Dockup.Container do
   require Logger
   import Dockup.Retry
+  import DefMemo
 
   def create_cache_container(command \\ Dockup.Command) do
     try do
@@ -32,8 +33,8 @@ defmodule Dockup.Container do
         Logger.info "Trying to pull nginx image"
         {_output, 0} = command.run("docker", ["run", "--name", "nginx",
           "-d", "-p", "80:80",
-          "-v", "#{Dockup.Configs.nginx_config_dir}:/etc/nginx/conf.d",
-          "-v", "#{Dockup.Configs.workdir}:/dockup:ro",
+          "-v", "#{nginx_config_dir_on_host}:/etc/nginx/conf.d",
+          #"-v", "#{Dockup.Configs.workdir_on_host}:/dockup:ro",
           "nginx:1.8"])
       end
       Logger.info "Nginx pulled and started"
@@ -55,5 +56,30 @@ defmodule Dockup.Container do
     unless Regex.match?(~r/docker-compose version.* 1\.([4-9]|([0-9][0-9]))(.*)+/, docker_compose_version) do
       raise "docker-compose version should be >= 1.4"
     end
+  end
+
+  def ensure_docker_sock_mounted(command \\ Dockup.Command) do
+    "/var/run/docker.sock" = volume_host_dir("volume_host_dir")
+  end
+
+  def start_containers(project_id, command \\ Dockup.Command) do
+    Logger.info "Starting containers of project #{project_id}"
+    command.run("docker-compose", ["-p", project_id, "up", "-d"], Dockup.Project.project_dir(project_id))
+  end
+
+  defmemo nginx_config_dir_on_host do
+    volume_host_dir(Dockup.Configs.nginx_config_dir)
+  end
+
+  defmemo workdir_on_host do
+    volume_host_dir(Dockup.Configs.workdir)
+  end
+
+  defp volume_host_dir(container_dir, command \\ Dockup.Command) do
+    {container_id, 0} = command.run("hostname", [])
+    {host_dir, 0} = command.run("docker", ["inspect",
+      "--format='{{ range .Mounts }}{{ if eq .Destination \"#{container_dir}\" }}{{ .Source }}{{ end }}{{ end }}'",
+      container_id])
+    host_dir
   end
 end

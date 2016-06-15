@@ -61,22 +61,22 @@ defmodule Dockup.ProjectTest do
     end
   end
 
-  test "auto_detect_project_type returns :static_site if index.html is found" do
+  test "project_type returns :static_site if index.html is found" do
     project_id = "auto/detect/static"
     project_dir = Dockup.Project.project_dir project_id
     File.mkdir_p project_dir
     File.touch "#{project_dir}/index.html"
 
-    assert Dockup.Project.auto_detect_project_type(project_id) == :static_site
+    assert Dockup.Project.project_type(project_id) == :static_site
     File.rm_rf Dockup.Configs.workdir <> "/auto"
   end
 
-  test "auto_detect_project_type returns :unknown if auto detection fails" do
+  test "project_type returns :unknown if auto detection fails" do
     project_id = "auto/detect/none"
     project_dir = Dockup.Project.project_dir project_id
     File.mkdir_p project_dir
 
-    assert Dockup.Project.auto_detect_project_type(project_id) == :unknown
+    assert Dockup.Project.project_type(project_id) == :unknown
     File.rm_rf Dockup.Configs.workdir <> "/auto"
   end
 

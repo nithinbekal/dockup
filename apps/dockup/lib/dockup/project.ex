@@ -2,8 +2,8 @@ defmodule Dockup.Project do
   require Logger
   import Dockup.Retry
 
-  def clone_repository(repository, branch, command \\ Dockup.Command) do
-    project_dir = project_id(repository, branch) |> project_dir
+  def clone_repository(project_id, repository, branch, command \\ Dockup.Command) do
+    project_dir = project_dir(project_id)
     Logger.info "Cloning #{repository} : #{branch} into #{project_dir}"
     File.rm_rf(project_dir)
     File.mkdir_p!(project_dir)
@@ -16,25 +16,21 @@ defmodule Dockup.Project do
       raise DockupException, "Cannot clone #{branch} of #{repository}. Error: #{error.message}"
   end
 
-  def project_id(repository, branch) do
-    {org, repo} = parse_repo_from_git_url(repository)
-    "#{org}/#{repo}/#{branch}"
-  end
-
   def project_dir(project_id) do
     "#{Dockup.Configs.workdir}/#{project_id}"
   end
 
-  def auto_detect_project_type(project_id) do
-    {:ok, cwd} = File.cwd
-    File.cd project_dir(project_id)
-    project_type = cond do
-      static_site? -> :static_site
+  def project_dir_on_host(project_id) do
+    "#{Dockup.Container.workdir_on_host}/#{project_id}"
+  end
+
+  def project_type(project_id) do
+    project_dir = project_dir(project_id)
+    cond do
+      static_site?(project_dir) -> :static_site
       # Rails etc can be auto detected in the future
       true -> :unknown
     end
-    File.cd cwd
-    project_type
   end
 
   # Waits until the urls all return expected HTTP status.
@@ -52,6 +48,10 @@ defmodule Dockup.Project do
     Logger.info "URLs #{inspect urls} seem up because they respond with 200."
   end
 
+  def start(project_id) do
+    Dockup.Container.start_containers(project_id)
+  end
+
   def get_status(url) do
     HTTPotion.get(url).status_code
   end
@@ -61,7 +61,7 @@ defmodule Dockup.Project do
     {org, repo}
   end
 
-  defp static_site? do
-    File.exists? "index.html"
+  defp static_site?(project_dir) do
+    File.exists? "#{project_dir}/index.html"
   end
 end

@@ -5,4 +5,8 @@ defmodule Dockup.Command do
   def run(command, args) do
     @command_module.run(command, args)
   end
+
+  def run(command, args, dir) do
+    @command_module.run(command, args, cd: dir)
+  end
 end
