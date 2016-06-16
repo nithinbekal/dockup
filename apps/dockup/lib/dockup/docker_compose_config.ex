@@ -3,7 +3,7 @@ defmodule Dockup.DockerComposeConfig do
 
   def write_config(:static_site, project_id) do
     Logger.info "Writing a 'static site' docker-compose.yml into project #{project_id}"
-    config = static_site_config(Dockup.Container.workdir_on_host)
+    config = static_site_config(Dockup.Project.project_dir_on_host(project_id))
     File.write!(config_file(project_id), config)
   end
 
