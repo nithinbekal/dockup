@@ -67,6 +67,29 @@ defmodule Dockup.Container do
     command.run("docker-compose", ["-p", "#{project_id}", "up", "-d"], Dockup.Project.project_dir(project_id))
   end
 
+  def stop_containers(project_id, command \\ Dockup.Command) do
+    Logger.info "Stopping containers of project #{project_id}"
+    command.run("docker-compose", ["-p", "#{project_id}", "stop"], Dockup.Project.project_dir(project_id))
+  end
+
+  def project_ports(project_id, command \\ Dockup.Command) do
+    {out, 0} = command.run("docker-compose", ["-p", "#{project_id}", "ps", "-q"], Dockup.Project.project_dir(project_id))
+    out
+    |> String.split("\n")
+    |> Enum.map(fn(x) -> String.strip(x) end)
+    |> Enum.map(fn(x) -> {x, get_ports_on_container(x)} end)
+  end
+
+  def get_ports_on_container(container_id, command \\ Dockup.Command) do
+    {out, 0} = command.run("docker", ["inspect",
+      "--format='{{range $key, $val := .NetworkSettings.Ports}}{{with $val}}{{with index . 0}}{{$key}}:{{.HostPort}}\n{{end}}{{end}}{{end}}'",
+      container_id])
+    out #  "   80/tcp:8000\n4000/tcp:4000\n   "
+    |> String.strip # "80/tcp:8000", "4000/tcp:4000"
+    |> String.split("\n") # ["80/tcp:8000", "4000/tcp:4000"]
+    |> Enum.map(fn(x) -> String.split(x, ":") |> List.to_tuple end) # [{"80/tcp", "8000"}, {"4000/tcp", "4000"}]
+  end
+
   defmemo nginx_config_dir_on_host do
     volume_host_dir(Dockup.Configs.nginx_config_dir)
   end
