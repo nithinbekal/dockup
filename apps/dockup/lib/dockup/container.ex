@@ -64,7 +64,7 @@ defmodule Dockup.Container do
 
   def start_containers(project_id, command \\ Dockup.Command) do
     Logger.info "Starting containers of project #{project_id}"
-    command.run("docker-compose", ["-p", project_id, "up", "-d"], Dockup.Project.project_dir(project_id))
+    command.run("docker-compose", ["-p", "#{project_id}", "up", "-d"], Dockup.Project.project_dir(project_id))
   end
 
   defmemo nginx_config_dir_on_host do

@@ -30,4 +30,8 @@ defmodule Dockup.FakeCommand do
     MatchError ->
       raise "Dockup.FakeCommand does not know command: '#{command}' with args: #{inspect args}"
   end
+
+  def run(command, args, _dir) do
+    run(command, args)
+  end
 end
