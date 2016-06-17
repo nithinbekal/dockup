@@ -1,5 +1,5 @@
 import React from 'react';
-const DeploymentDisplay = (props) => {
+const DeploymentList = (props) => {
   return (
     <div>Deployments
       <table>
@@ -25,6 +25,6 @@ const DeploymentDisplay = (props) => {
   )
 }
 
-DeploymentDisplay.propTypes = { deployments: React.PropTypes.array.isRequired };
-DeploymentDisplay.defaultProps = { deployments: [{name: "Repo 1", logs: "111", url: "http://one.com"}] };
-export default DeploymentDisplay
+DeploymentList.propTypes = { deployments: React.PropTypes.array.isRequired };
+DeploymentList.defaultProps = { deployments: [{name: "Repo 1", logs: "111", url: "http://one.com"}] };
+export default DeploymentList
