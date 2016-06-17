@@ -7,7 +7,6 @@ class DeploymentForm extends Component {
     this.state = {
       username: "",
       repository: "",
-      deployments: []
     }
   }
 
