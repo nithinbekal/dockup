@@ -1,4 +1,4 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import DeploymentForm from "./components/deployment_form"
-ReactDOM.render(<DeploymentForm />, document.getElementById('deployments_container'));
+import DeploymentIndex from "./components/deployment_index"
+ReactDOM.render(<DeploymentIndex />, document.getElementById('deployments_container'));
