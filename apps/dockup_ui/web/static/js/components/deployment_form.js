@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from "react-dom";
-import DeploymentDisplay from './deployment_display';
 
 class DeploymentForm extends Component {
   constructor(props) {
@@ -30,8 +29,10 @@ class DeploymentForm extends Component {
 
   handleClick(e) {
     const newElement = {name: `${this.state.username}/${this.state.repository}`, logs: '111', url: "http://one.com"};
-    const deploymentsArray = this.state.deployments;
-    this.setState({deployments: deploymentsArray.concat(newElement)}, this.clearInput);
+    let deploymentsArray = this.state.deployments;
+    deploymentsArray = deploymentsArray.concat(newElement)
+    this.setState({deployments: deploymentsArray});
+    this.props.add_deployment(deploymentsArray);
   }
 
   render() {
@@ -43,7 +44,6 @@ class DeploymentForm extends Component {
         <br />
         <div>{this.displayHelpText()}</div>
         <br/>
-        <DeploymentDisplay deployments={this.state.deployments}/>
       </div>
     )
   }
