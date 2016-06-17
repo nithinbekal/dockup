@@ -9,13 +9,15 @@ class DeploymentIndex extends Component {
     }
   }
 
-  adding_deployment(all_deployments) {
-    this.setState({deployments: all_deployments});
+  addDeployment(newDeployment) {
+    let deploymentsArray = this.state.deployments;
+    deploymentsArray = deploymentsArray.concat(newDeployment)
+    this.setState({deployments: deploymentsArray});
   }
   render() {
     return (
       <div>
-        <DeploymentForm add_deployment={this.adding_deployment.bind(this)}/>
+        <DeploymentForm newDeployment={this.addDeployment.bind(this)}/>
         <DeploymentList deployments={this.state.deployments}/>
       </div>
     )
