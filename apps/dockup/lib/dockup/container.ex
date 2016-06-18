@@ -90,6 +90,12 @@ defmodule Dockup.Container do
     |> Enum.map(fn(x) -> String.split(x, ":") |> List.to_tuple end) # [{"80/tcp", "8000"}, {"4000/tcp", "4000"}]
   end
 
+  def get_ip_of_container(container_id, command \\ Dockup.Command) do
+    {out, 0} = command.run("docker", ["inspect",
+      "--format='{{.NetworkSettings.IPAddress}}'", container_id])
+    String.strip out
+  end
+
   defmemo nginx_config_dir_on_host do
     volume_host_dir(Dockup.Configs.nginx_config_dir)
   end
