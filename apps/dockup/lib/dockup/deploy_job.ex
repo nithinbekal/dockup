@@ -5,15 +5,16 @@ defmodule Dockup.DeployJob do
     spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
-  def perform(project_id, repository, branch, callback, project \\ Dockup.Project,
-               config_generator \\ Dockup.ConfigGenerator, container \\ Dockup.Container) do
+  def perform(project_identifier, repository, branch, callback, project \\ Dockup.Project,
+               config_generator \\ Dockup.ConfigGenerator) do
     #project_id = project.project_id(repository, branch)
+    project_id = String.to_string(project_identifier)
     project.clone_repository(project_id, repository, branch)
 
     # Read config
     # if config can't be read, do the following
     urls = project.project_type(project_id)
-    |> deploy(project_id, config_generator, container)
+    |> deploy(project_id, config_generator, project)
 
     project.wait_till_up(urls)
     success_callback(callback, repository, branch, urls)
@@ -26,16 +27,13 @@ defmodule Dockup.DeployJob do
       error_callback(callback, repository, branch, e.message)
   end
 
-  defp deploy(:static_site, project_id, config_generator, container) do
+  def deploy(:static_site, project_id, config_generator, project) do
     Logger.info "Deploying static site #{project_id}"
-    Dockup.ConfigGenerator.generate(:static_site, project_id)
-    Dockup.Container.start(project_id)
-    url = ""
-    container.reload_nginx
-    url
+    config_generator.generate(:static_site, project_id)
+    project.start(project_id)
   end
 
-  defp deploy(_, app_id, _, _) do
+  def deploy(_, app_id, _, _) do
     raise DockupException, "Don't know how to deploy #{app_id}"
   end
 
@@ -49,10 +47,5 @@ defmodule Dockup.DeployJob do
 
   defp error_callback({callback_module, callback_args}, repository, branch, reason) do
     callback_module.deployment_failure(repository, branch, reason, callback_args)
-  end
-
-  defp localtime do
-    {{year, month, day}, {hour, minute, second}} = :calendar.local_time
-    "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second}"
   end
 end

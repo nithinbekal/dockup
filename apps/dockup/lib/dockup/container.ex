@@ -58,7 +58,7 @@ defmodule Dockup.Container do
     end
   end
 
-  def ensure_docker_sock_mounted(command \\ Dockup.Command) do
+  def ensure_docker_sock_mounted do
     "/var/run/docker.sock" = volume_host_dir("volume_host_dir")
   end
 
@@ -72,22 +72,26 @@ defmodule Dockup.Container do
     command.run("docker-compose", ["-p", "#{project_id}", "stop"], Dockup.Project.project_dir(project_id))
   end
 
-  def project_ports(project_id, command \\ Dockup.Command) do
+  def project_ports(project_id, container \\ __MODULE__) do
+    get_project_container_ids(project_id)
+    |> Enum.map(fn(x) -> {container.get_ip_of_container(x), container.get_ports_on_container(x)} end)
+  end
+
+  def get_project_container_ids(project_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker-compose", ["-p", "#{project_id}", "ps", "-q"], Dockup.Project.project_dir(project_id))
     out
     |> String.split("\n")
     |> Enum.map(fn(x) -> String.strip(x) end)
-    |> Enum.map(fn(x) -> {x, get_ports_on_container(x)} end)
   end
 
   def get_ports_on_container(container_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker", ["inspect",
-      "--format='{{range $key, $val := .NetworkSettings.Ports}}{{with $val}}{{with index . 0}}{{$key}}:{{.HostPort}}\n{{end}}{{end}}{{end}}'",
+      "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'",
       container_id])
-    out #  "   80/tcp:8000\n4000/tcp:4000\n   "
-    |> String.strip # "80/tcp:8000", "4000/tcp:4000"
-    |> String.split("\n") # ["80/tcp:8000", "4000/tcp:4000"]
-    |> Enum.map(fn(x) -> String.split(x, ":") |> List.to_tuple end) # [{"80/tcp", "8000"}, {"4000/tcp", "4000"}]
+    out #  "   80/tcp\n4000/tcp\n   "
+    |> String.strip # "80/tcp\n4000/tcp"
+    |> String.split("\n") # ["80/tcp", "4000/tcp"]
+    |> Enum.map(fn(x) -> String.split(x, "/") |> List.first end) # ["80", "4000"]
   end
 
   def get_ip_of_container(container_id, command \\ Dockup.Command) do

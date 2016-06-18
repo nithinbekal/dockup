@@ -27,19 +27,27 @@ defmodule Dockup.NginxConfig do
     """
   end
 
-  def hash(project_id) do
-    :crypto.hash(:sha, project_id) |> Base.encode16
-  end
-
   def config_file(project_id) do
-    Path.join(Dockup.Configs.nginx_config_dir, "#{hash(project_id)}.conf")
+    Path.join(Dockup.Configs.nginx_config_dir, "#{project_id}.conf")
   end
 
-  def write_config(:static_site, project_id, haikunator \\ Dockup.Haikunator) do
-    url = haikunator.haikunated_url
-    Logger.info "Writing nginx config to serve #{project_id} at http://#{url}"
-    config = static_site_config(project_id, url)
+  #def write_config(:static_site, project_id, haikunator \\ Dockup.Haikunator) do
+    #url = haikunator.haikunated_url
+    #Logger.info "Writing nginx config to serve #{project_id} at http://#{url}"
+    #config = static_site_config(project_id, url)
+    #File.write(config_file(project_id), config)
+    #%{"80" => url}
+  #end
+  def write_config(project_id, ips_ports, haikunator \\ Dockup.Haikunator) do
+    Logger.info "Writing nginx config to serve #{project_id}"
+    ports_urls = Enum.reduce(ips_ports, [], fn({ip, ports}, acc) ->
+      acc ++ Enum.map(ports, fn(port) ->
+        {"http://#{ip}:#{port}", haikunator.haikunated_url}
+      end)
+    end)
+    #config = proxy_passing_port(ports_urls)
+    config = ""
     File.write(config_file(project_id), config)
-    %{"80" => url}
+    ports_urls
   end
 end
