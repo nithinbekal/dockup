@@ -22,8 +22,8 @@ defmodule Dockup.DeployJob do
     error in MatchError ->
       Logger.error (inspect error)
       error_callback(callback, repository, branch, (inspect error))
-    e ->
-      message = "An unexpected error occured when deploying #{project_id}"
+    _ ->
+      message = "An unexpected error occured when deploying #{project_identifier}"
       Logger.error message
       error_callback(callback, repository, branch, message)
   end
