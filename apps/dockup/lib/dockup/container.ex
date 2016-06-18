@@ -92,6 +92,7 @@ defmodule Dockup.Container do
     |> String.strip # "80/tcp\n4000/tcp"
     |> String.split("\n") # ["80/tcp", "4000/tcp"]
     |> Enum.map(fn(x) -> String.split(x, "/") |> List.first end) # ["80", "4000"]
+    |> Enum.filter(fn(x) -> String.length(x) > 0 end)
   end
 
   def get_ip_of_container(container_id, command \\ Dockup.Command) do

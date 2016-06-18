@@ -1,0 +1,6 @@
+#!/bin/bash
+
+mix do local.hex, deps.get, compile
+cd apps/dockup_ui && npm install
+mix ecto.create && mix ecto.migrate
+cd ../..

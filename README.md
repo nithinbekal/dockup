@@ -34,6 +34,14 @@ You can access Dockup UI at http://localhost:4000.
 
 ### Development on OSX
 
+    # Install latest elixir
+    brew install elixir
+
+    cd dockup
+    ./scripts/setup
+
+
+Once compilation runs fine, you can start dockup.
 If you are running this on OSX, unless you have docker CLI available in the
 development environment, you need to enable dry run mode in order to start
 Dockup. Run:
@@ -42,7 +50,12 @@ Dockup. Run:
     DOCKUP_DRY_RUN=true iex -S mix phoenix.server
 
 
-### Using Vagrant for testing
+### Using Vagrant
+
+It is recommended to use Vagrant for the following reasons:
+
+1. You can use real docker and do real deployments on OSX
+2. You can destroy containers and restart from a clean slate
 
 A `Vagrantfile` is checked in which will provision an ubuntu machine with
 everything ready for testing the app. Here's how you can set it up:
@@ -50,15 +63,13 @@ everything ready for testing the app. Here's how you can set it up:
 ```
 $ vagrant up
 $ vagrant ssh
-$ mix local.hex
-$ mix deps.get
-$ mix clean
-$ mix compile
+$ cd /vagrant
+$ ./scripts/setup
 ```
 
 ## Environment variables
 
-Refer `config/config.exs` to see the list of configurations
+Refer `apps/dockup/config/config.exs` to see the list of configurations
 
 ## API
 
@@ -67,5 +78,5 @@ Refer `config/config.exs` to see the list of configurations
 This API endpoint is used to deploy a dockerized app.
 
 ```
-curl -XPOST  -d '{"git_url":"https://github.com/code-mancers/project.git","branch":"master","callback_url":"fake_callback"}' -H "Content-Type: application/json" http://localhost:4000/api/deployment
+curl -XPOST  -d '{"git_url":"https://github.com/code-mancers/project.git","branch":"master","callback_url":"fake_callback"}' -H "Content-Type: application/json" http://localhost:4000/api/deployments
 ```

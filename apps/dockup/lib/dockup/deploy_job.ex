@@ -6,7 +6,7 @@ defmodule Dockup.DeployJob do
   end
 
   def perform(project_identifier, repository, branch, callback, project \\ Dockup.Project,
-               config_generator \\ Dockup.ConfigGenerator) do
+               deploy_job \\ __MODULE__) do
     #project_id = project.project_id(repository, branch)
     project_id = String.to_string(project_identifier)
     project.clone_repository(project_id, repository, branch)
@@ -14,7 +14,7 @@ defmodule Dockup.DeployJob do
     # Read config
     # if config can't be read, do the following
     urls = project.project_type(project_id)
-    |> deploy(project_id, config_generator, project)
+    |> deploy_job.deploy(project_id)
 
     project.wait_till_up(urls)
     success_callback(callback, repository, branch, urls)
@@ -26,6 +26,8 @@ defmodule Dockup.DeployJob do
       Logger.error e.message
       error_callback(callback, repository, branch, e.message)
   end
+
+  def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)
 
   def deploy(:static_site, project_id, config_generator, project) do
     Logger.info "Deploying static site #{project_id}"
