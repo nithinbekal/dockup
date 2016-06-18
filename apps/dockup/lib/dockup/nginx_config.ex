@@ -55,12 +55,12 @@ defmodule Dockup.NginxConfig do
   def proxy_passing_port({proxy, url}) do
     """
     server{
-    listen 80;
+      listen 80;
       server_name #{url};
 
       location / {
-         proxy_pass #{proxy};
-         proxy_set_header Host $host;
+        proxy_pass #{proxy};
+        proxy_set_header Host $host;
       }
     }
     """
