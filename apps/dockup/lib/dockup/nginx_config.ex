@@ -27,6 +27,15 @@ defmodule Dockup.NginxConfig do
     """
   end
 
+  # accepts a urls_proxies tuple.
+  # e.g.
+  # [{"http://fake_host:3000", "shy-surf-3571.127.0.0.1.xip.io"}
+  # {"http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"}
+  # {"http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
+  def config_proxy_passing_port(urls_proxies) do
+    Enum.map(urls_proxies, &proxy_passing_port&1) |> Enum.join
+  end
+
   def hash(project_id) do
     :crypto.hash(:sha, project_id) |> Base.encode16
   end
@@ -41,5 +50,19 @@ defmodule Dockup.NginxConfig do
     config = static_site_config(project_id, url)
     File.write(config_file(project_id), config)
     %{"80" => url}
+  end
+
+  def proxy_passing_port({a,b}) do
+    """
+    server{
+    listen 80;
+      server_name #{b};
+
+      location / {
+         proxy_pass #{a};
+         proxy_set_header Host $host;
+      }
+    }
+    """
   end
 end
