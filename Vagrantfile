@@ -20,6 +20,9 @@ Vagrant.configure(2) do |config|
     sudo apt-get install -y elixir
 
     sudo -u postgres createuser -s vagrant
+    sudo sh -c "echo 'local all all trust' > /etc/postgresql/9.3/main/pg_hba.conf"
+    sudo sh -c "echo 'host all all 127.0.0.1/32 trust' >> /etc/postgresql/9.3/main/pg_hba.conf"
+    sudo service postgresql restart
 
     sudo apt-get install -y curl
 
