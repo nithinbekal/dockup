@@ -12,9 +12,14 @@ Vagrant.configure(2) do |config|
 
     # Install Elixir
     wget http://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && sudo dpkg -i erlang-solutions_1.0_all.deb
+    wget -qO- https://deb.nodesource.com/setup_6.x | sudo bash
     sudo apt-get update
+    sudo apt-get install -y postgresql
+    sudo apt-get install -y nodejs build-essential
     sudo apt-get install -y esl-erlang
     sudo apt-get install -y elixir
+
+    sudo -u postgres createuser -s vagrant
 
     sudo apt-get install -y curl
 
