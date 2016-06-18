@@ -12,7 +12,7 @@ defmodule Dockup.Mixfile do
 
   def application do
     [
-      applications: [:logger, :poison, :defmemo],
+      applications: [:logger, :poison, :defmemo, :httpotion],
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -23,7 +23,8 @@ defmodule Dockup.Mixfile do
   defp deps do
     [
       {:poison, "~>2.1.0"},
-      {:defmemo, "~> 0.1.1"}
+      {:defmemo, "~> 0.1.1"},
+      {:httpotion, "~> 3.0.0"}
     ]
   end
 end
