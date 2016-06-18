@@ -58,6 +58,10 @@ defmodule Dockup.Container do
     end
   end
 
+  def running_in_docker? do
+    File.exists? "/.dockerenv"
+  end
+
   def ensure_docker_sock_mounted do
     "/var/run/docker.sock" = volume_host_dir("volume_host_dir")
   end
@@ -110,10 +114,14 @@ defmodule Dockup.Container do
   end
 
   defp volume_host_dir(container_dir, command \\ Dockup.Command) do
-    {container_id, 0} = command.run("hostname", [])
-    {host_dir, 0} = command.run("docker", ["inspect",
-      "--format='{{ range .Mounts }}{{ if eq .Destination \"#{container_dir}\" }}{{ .Source }}{{ end }}{{ end }}'",
-      container_id])
-    host_dir
+    if running_in_docker? do
+      {container_id, 0} = command.run("hostname", [])
+      {host_dir, 0} = command.run("docker", ["inspect",
+        "--format='{{ range .Mounts }}{{ if eq .Destination \"#{container_dir}\" }}{{ .Source }}{{ end }}{{ end }}'",
+        container_id])
+      host_dir
+    else
+      container_dir
+    end
   end
 end

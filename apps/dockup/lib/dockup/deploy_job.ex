@@ -8,7 +8,7 @@ defmodule Dockup.DeployJob do
   def perform(project_identifier, repository, branch, callback, project \\ Dockup.Project,
                deploy_job \\ __MODULE__) do
     #project_id = project.project_id(repository, branch)
-    project_id = String.to_string(project_identifier)
+    project_id = to_string(project_identifier)
     project.clone_repository(project_id, repository, branch)
 
     # Read config
@@ -23,8 +23,9 @@ defmodule Dockup.DeployJob do
       Logger.error (inspect error)
       error_callback(callback, repository, branch, (inspect error))
     e ->
-      Logger.error e.message
-      error_callback(callback, repository, branch, e.message)
+      message = "An unexpected error occured when deploying #{project_id}"
+      Logger.error message
+      error_callback(callback, repository, branch, message)
   end
 
   def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)

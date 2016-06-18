@@ -1,5 +1,10 @@
 defmodule Dockup do
   def run_preflight_checks do
+    # We need access to docker socket to manage docker containers on the host
+    if Dockup.Container.running_in_docker? do
+      Dockup.Container.ensure_docker_sock_mounted
+    end
+
     # Check if workdir exists
     Dockup.Configs.workdir
     # Ensure we know the workdir on host
