@@ -9,7 +9,6 @@ defmodule Dockup.Retry do
             unquote(block)
           rescue
             e ->
-              IO.puts (inspect e)
               Logger.info "Attempt #{attempt} failed because of error: #{inspect e}"
               :timer.sleep(unquote(sleep))
               self.(attempt + 1, self)
