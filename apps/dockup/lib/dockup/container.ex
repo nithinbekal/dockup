@@ -16,7 +16,7 @@ defmodule Dockup.Container do
     end
   end
 
-  def run_nginx_container(command \\ Dockup.Command) do
+  def run_nginx_container(command \\ Dockup.Command, container \\ __MODULE__) do
     File.write!("#{Dockup.Configs.nginx_config_dir}/default.conf", Dockup.NginxConfig.default_config)
     {status, exit_code} = command.run("docker", ["inspect", "--format='{{.State.Running}}'", "nginx"])
     if status == "false" do
@@ -33,8 +33,7 @@ defmodule Dockup.Container do
         Logger.info "Trying to pull nginx image"
         {_output, 0} = command.run("docker", ["run", "--name", "nginx",
           "-d", "-p", "80:80",
-          "-v", "#{nginx_config_dir_on_host}:/etc/nginx/conf.d",
-          #"-v", "#{Dockup.Configs.workdir_on_host}:/dockup:ro",
+          "-v", "#{container.nginx_config_dir_on_host}:/etc/nginx/conf.d",
           "nginx:1.8"])
       end
       Logger.info "Nginx pulled and started"

@@ -109,7 +109,14 @@ defmodule Dockup.ContainerTest do
       end
     end
 
-    logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxDoesNotExistCommand) end)
+    defmodule FakeContainer do
+      def nginx_config_dir_on_host do
+        "fake_dir_on_host"
+      end
+    end
+
+    logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxDoesNotExistCommand, FakeContainer) end)
+    IO.puts logs
     assert logs =~ "Nginx container not found."
     assert logs =~ "Trying to pull nginx image"
     assert logs =~ "Nginx pulled and started"
