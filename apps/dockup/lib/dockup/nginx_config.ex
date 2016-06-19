@@ -1,16 +1,5 @@
 defmodule Dockup.NginxConfig do
   require Logger
-  def static_site_config(project_id, url) do
-    """
-    server {
-      listen 80;
-
-      server_name #{url};
-      root /dockup/#{project_id};
-      index index.html;
-    }
-    """
-  end
 
   def default_config do
     """
@@ -33,13 +22,15 @@ defmodule Dockup.NginxConfig do
   # {"http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"}
   # {"http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
   def config_proxy_passing_port(urls_proxies) do
-    Enum.map(urls_proxies, &proxy_passing_port&1) |> Enum.join
+    Enum.map(urls_proxies, &proxy_passing_port&1) |> Enum.join("\n")
   end
 
   def config_file(project_id) do
     Path.join(Dockup.Configs.nginx_config_dir, "#{project_id}.conf")
   end
 
+  # Given a project_id and docker ports, writes the nginx config to
+  # proxy pass haikunated URLs to the docker ports
   def write_config(project_id, ips_ports, haikunator \\ Dockup.Haikunator) do
     Logger.info "Writing nginx config to serve #{project_id}"
     ports_urls = Enum.reduce(ips_ports, [], fn({ip, ports}, acc) ->
@@ -54,7 +45,7 @@ defmodule Dockup.NginxConfig do
 
   def proxy_passing_port({proxy, url}) do
     """
-    server{
+    server {
       listen 80;
       server_name #{url};
 

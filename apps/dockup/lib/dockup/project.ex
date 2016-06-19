@@ -17,11 +17,11 @@ defmodule Dockup.Project do
   end
 
   def project_dir(project_id) do
-    "#{Dockup.Configs.workdir}/#{project_id}"
+    Path.join(Dockup.Configs.workdir, project_id)
   end
 
-  def project_dir_on_host(project_id) do
-    "#{Dockup.Container.workdir_on_host}/#{project_id}"
+  def project_dir_on_host(project_id, container \\ Dockup.Container) do
+    Path.join(container.workdir_on_host, project_id)
   end
 
   def project_type(project_id) do

@@ -27,7 +27,7 @@ defmodule Dockup.Configs do
     File.mkdir_p dir
     case File.exists?(dir) do
       true -> dir
-      _ -> raise "Invalid workdir"
+      _ -> raise "Invalid directory #{dir}"
     end
   end
 end

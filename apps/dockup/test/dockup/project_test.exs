@@ -2,30 +2,15 @@ defmodule Dockup.ProjectTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
-  test "project_id is of the format org_name/repo_name/branch for github https url" do
-    id = Dockup.Project.project_id("https://github.com/code-mancers/dockup.git", "master")
-    assert id == "code-mancers/dockup/master"
-  end
-
-  test "project_id is of the format org_name/repo_name/branch for github ssh url" do
-    id = Dockup.Project.project_id("git@github.com:code-mancers/dockup.git", "master")
-    assert id == "code-mancers/dockup/master"
-  end
-
-  test "project_id is of the format org_name/repo_name/branch for gitlab ssh url" do
-    id = Dockup.Project.project_id("git@your_server.com:code-mancers/dockup.git", "master")
-    assert id == "code-mancers/dockup/master"
-  end
-
   test "project_dir of a project is <Dockup workdir>/<project_id>" do
-    assert Dockup.Project.project_dir("foo/test/baz") == "#{Dockup.Configs.workdir}/foo/test/baz"
+    assert Dockup.Project.project_dir("foo") == "#{Dockup.Configs.workdir}/foo"
   end
 
   # Remove mocking in favor of dependency injection and make this test pass
   test "clone_repository clones the given branch of git repository into project_dir" do
     repository = "https://github.com/code-mancers/dockup.git"
     branch = "master"
-    project_dir = Dockup.Project.project_id(repository, branch) |> Dockup.Project.project_dir
+    project_dir = Dockup.Project.project_dir("foo")
 
     defmodule GitCloneCommand do
       def run(cmd, args) do
@@ -33,7 +18,7 @@ defmodule Dockup.ProjectTest do
         {"", 0}
       end
     end
-    Dockup.Project.clone_repository(repository, branch, GitCloneCommand)
+    Dockup.Project.clone_repository("foo", repository, branch, GitCloneCommand)
     [cmd | args] = String.split("git clone --branch=master --depth=1 #{repository} #{project_dir}")
 
     receive do
@@ -54,7 +39,7 @@ defmodule Dockup.ProjectTest do
       end
     end
     try do
-      Dockup.Project.clone_repository(repository, branch, FailingGitCloneCommand)
+      Dockup.Project.clone_repository("foo", repository, branch, FailingGitCloneCommand)
     rescue
       error ->
         assert error.message == "Cannot clone #{branch} of #{repository}. Error: cannot clone this shitz"
@@ -96,5 +81,14 @@ defmodule Dockup.ProjectTest do
     refute logs =~ "Attempt 3 failed"
 
     Agent.stop(RetryCount)
+  end
+
+  test "project_dir_on_host host returns the dir of project on host" do
+    defmodule FakeContainer do
+      def workdir_on_host do
+        "/fake_workdir"
+      end
+    end
+    assert Dockup.Project.project_dir_on_host("foo", FakeContainer) == "/fake_workdir/foo"
   end
 end
