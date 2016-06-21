@@ -7,6 +7,8 @@ class DeploymentForm extends Component {
     this.state = {
       username: "",
       repository: "",
+      url: "",
+      branch: ""
     }
   }
 
@@ -31,14 +33,45 @@ class DeploymentForm extends Component {
     this.props.newDeployment(newElement);
   }
 
+  handleUrlChange(event) {
+    this.setState({url: event.target.value});
+  }
+
+  handleBranchChange(event) {
+    this.setState({branch: event.target.value});
+  }
+
   render() {
+    var partial;
+    if(this.props.isGithub == true) {
+      partial = <div className="col-md-12">
+                  <label>https://github.com/
+                    </label>
+                  <div className="col-md-2">
+                    <input name="username" onChange={this.handleUserNameChange.bind(this)} className="form-control"/>
+                  </div>/
+                  <div className="col-md-2">
+                    <input name="repository" onChange={this.handleRepositoryChange.bind(this)} className="form-control"/>
+                  </div>.git
+                </div>
+    } else {
+      partial = <div>
+                  Url :
+                  <input name="url" onChange={this.handleUrlChange.bind(this)} className="form-control"/>
+                </div>
+    }
     return (
-      <div>https://github.com/
-        <input name="username" onChange={this.handleUserNameChange.bind(this)}/>/
-        <input name="repository" onChange={this.handleRepositoryChange.bind(this)} />
-        <button name="deploy" onClick={this.handleClick.bind(this)} disabled={(!this.state.username || !this.state.repository)}>Deploy</button>
+      <div>
+        {partial}
+        <br />
+        <b>
+          Branch :
+        </b>
+        <br />
+        <input name="branch" class="form-control" onChange={this.handleBranchChange.bind(this)} className="form-control" />
         <br />
         <div>{this.displayHelpText()}</div>
+        <button name="deploy" onClick={this.handleClick.bind(this)} disabled={(!this.state.username || !this.state.repository)} className="btn btn-primary">Deploy</button>
         <br/>
       </div>
     )
