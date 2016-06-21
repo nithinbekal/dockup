@@ -45,19 +45,31 @@ class DeploymentForm extends Component {
     var partial;
     if(this.props.isGithub == true) {
       partial = <div className="col-md-12">
-                  <label>https://github.com/
-                    </label>
-                  <div className="col-md-2">
-                    <input name="username" onChange={this.handleUserNameChange.bind(this)} className="form-control"/>
-                  </div>/
-                  <div className="col-md-2">
-                    <input name="repository" onChange={this.handleRepositoryChange.bind(this)} className="form-control"/>
-                  </div>.git
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <b> https://github.com/ </b>
+                        </td>
+                        <td>
+                          <input name="username" onChange={this.handleUserNameChange.bind(this)} className="form-control"/>
+                        </td>
+                        <td>
+                          <b>/</b>
+                        </td>
+                        <td>
+                          <input name="repository" onChange={this.handleRepositoryChange.bind(this)} className="form-control"/>
+                        </td>
+                        <td>
+                          <b>.git</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
     } else {
       partial = <div>
-                  Url :
-                  <input name="url" onChange={this.handleUrlChange.bind(this)} className="form-control"/>
+                  Url :<input name="url" onChange={this.handleUrlChange.bind(this)} className="form-control"/>
                 </div>
     }
     return (
