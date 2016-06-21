@@ -21,10 +21,15 @@ class DeploymentForm extends Component {
   }
 
   displayHelpText() {
-    if (!this.state.username || !this.state.repository) {
-      return "Please enter a github project to deploy";
+    if (!this.state.username || !this.state.repository || !this.state.branch) {
+      return "Please enter a github project and branch to deploy";
+    } else if ((this.props.isGithub == false) && (!this.state.url || !this.state.branch)){
+      return "Please enter a project url and branch to deploy";
     } else {
-      return `Click the Deploy button to deploy https://github.com/${this.state.username}/${this.state.repository}`;
+      if ((this.props.isGithub == false) && (this.state.url || this.state.branch)){
+        return `Click the Deploy button to deploy ${this.state.url} with branch: ${this.state.branch}`
+      }
+      return `Click the Deploy button to deploy https://github.com/${this.state.username}/${this.state.repository} with branch: ${this.state.branch}`;
     }
   }
 
