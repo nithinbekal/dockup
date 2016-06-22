@@ -28,18 +28,22 @@ class DeploymentForm extends Component {
   displayHelpText() {
     if (!this.state.username || !this.state.repository || !this.state.branch) {
       return "Please enter a github project and branch to deploy";
-    } else if ((this.props.isGithub == false) && (!this.state.url || !this.state.branch)) {
+    } else if ((this.props.isGithub == false) && (isAnyFieldEmpty(!this.state.url, !this.state.branch))) {
       return "Please enter a project url and branch to deploy";
     } else {
-      if ((this.props.isGithub == false) && (this.state.url || this.state.branch)){
-        return `Click the Deploy button to deploy ${this.state.url} with branch: ${this.state.branch}`
-      }
-      return `Click the Deploy button to deploy https://github.com/${this.state.username}/${this.state.repository} with branch: ${this.state.branch}`;
+      return displayDeployMessage(this.props.isGithub, isAnyFieldEmpty(this.state.url,
+                                                                this.state.branch),
+                                                                this.state.url,
+                                                                this.state.branch,
+                                                                this.state.username,
+                                                                this.state.repository);
     }
   }
 
   handleClick(e) {
-    const newElement = {name: `${this.state.username}/${this.state.repository}`, logs: '111', url: "http://one.com"};
+    const newElement = {name: `${this.state.username}/${this.state.repository}`,
+                        logs: '111',
+                        url: "http://one.com"};
     this.props.newDeployment(newElement);
   }
 
@@ -94,6 +98,16 @@ class DeploymentForm extends Component {
         <button name="deploy" onClick={this.handleClick} disabled={(!this.state.username || !this.state.repository)} className="btn btn-primary">Deploy</button>
       </div>
     )
+  }
+}
+let isAnyFieldEmpty = function(field1, field2) {
+  return (field1 || field2);
+}
+let displayDeployMessage = function(isGithub, isAnyFieldEmpty, url, branch, username, repository) {
+  if ((isGithub == false) && isAnyFieldEmpty) {
+    return `Click the Deploy button to deploy ${url} with branch: ${branch}`
+  } else {
+    return `Click the Deploy button to deploy https://github.com/${username}/${repository} with branch: ${branch}`;
   }
 }
 export default DeploymentForm
