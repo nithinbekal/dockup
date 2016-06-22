@@ -10,6 +10,11 @@ class DeploymentForm extends Component {
       url: "",
       branch: ""
     }
+    this.handleUserNameChange = this.handleUserNameChange.bind(this);
+    this.handleRepositoryChange = this.handleRepositoryChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleUrlChange = this.handleUrlChange.bind(this);
+    this.handleBranchChange = this.handleBranchChange.bind(this);
   }
 
   handleUserNameChange(event) {
@@ -57,13 +62,13 @@ class DeploymentForm extends Component {
                           <b> https://github.com/ </b>
                         </td>
                         <td>
-                          <input name="username" onChange={this.handleUserNameChange.bind(this)} className="form-control"/>
+                          <input name="username" onChange={this.handleUserNameChange} className="form-control"/>
                         </td>
                         <td>
                           <b>/</b>
                         </td>
                         <td>
-                          <input name="repository" onChange={this.handleRepositoryChange.bind(this)} className="form-control"/>
+                          <input name="repository" onChange={this.handleRepositoryChange} className="form-control"/>
                         </td>
                         <td>
                           <b>.git</b>
@@ -74,7 +79,7 @@ class DeploymentForm extends Component {
                 </div>
     } else {
       partial = <div>
-                  Url :<input name="url" onChange={this.handleUrlChange.bind(this)} className="form-control"/>
+                  Url :<input name="url" onChange={this.handleUrlChange} className="form-control"/>
                 </div>
     }
     return (
@@ -84,9 +89,9 @@ class DeploymentForm extends Component {
         <b>
           Branch :
         </b>
-        <input name="branch" class="form-control" onChange={this.handleBranchChange.bind(this)} className="form-control" />
+        <input name="branch" class="form-control" onChange={this.handleBranchChange} className="form-control" />
         <div>{this.displayHelpText()}</div>
-        <button name="deploy" onClick={this.handleClick.bind(this)} disabled={(!this.state.username || !this.state.repository)} className="btn btn-primary">Deploy</button>
+        <button name="deploy" onClick={this.handleClick} disabled={(!this.state.username || !this.state.repository)} className="btn btn-primary">Deploy</button>
       </div>
     )
   }
