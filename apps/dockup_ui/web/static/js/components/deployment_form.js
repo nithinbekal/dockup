@@ -23,7 +23,7 @@ class DeploymentForm extends Component {
   displayHelpText() {
     if (!this.state.username || !this.state.repository || !this.state.branch) {
       return "Please enter a github project and branch to deploy";
-    } else if ((this.props.isGithub == false) && (!this.state.url || !this.state.branch)){
+    } else if ((this.props.isGithub == false) && (!this.state.url || !this.state.branch)) {
       return "Please enter a project url and branch to deploy";
     } else {
       if ((this.props.isGithub == false) && (this.state.url || this.state.branch)){
@@ -47,7 +47,7 @@ class DeploymentForm extends Component {
   }
 
   render() {
-    var partial;
+    let partial;
     if(this.props.isGithub == true) {
       partial = <div className="col-md-12">
                   <table>
@@ -84,12 +84,9 @@ class DeploymentForm extends Component {
         <b>
           Branch :
         </b>
-        <br />
         <input name="branch" class="form-control" onChange={this.handleBranchChange.bind(this)} className="form-control" />
-        <br />
         <div>{this.displayHelpText()}</div>
         <button name="deploy" onClick={this.handleClick.bind(this)} disabled={(!this.state.username || !this.state.repository)} className="btn btn-primary">Deploy</button>
-        <br/>
       </div>
     )
   }
