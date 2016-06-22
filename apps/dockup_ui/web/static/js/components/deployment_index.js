@@ -13,28 +13,25 @@ class DeploymentIndex extends Component {
 
   addDeployment(newDeployment) {
     let deploymentsArray = this.state.deployments;
-    deploymentsArray = deploymentsArray.concat(newDeployment)
+    deploymentsArray.push(newDeployment);
     this.setState({deployments: deploymentsArray});
   }
 
   handleClick(event) {
-    if(this.state.isGithub == true) {
-      this.setState({isGithub: false})
-    } else {
-      this.setState({isGithub: true});
-    }
+    this.setState({isGithub: !this.state.isGithub})
   }
+
   render() {
-    var value;
+    let displayLinkText;
     if(this.state.isGithub == true) {
-      value = "Not using github?"
+      displayLinkText = "Not using github?"
     } else {
-      value = "Using github?";
+      displayLinkText = "Using github?";
     }
     return (
       <div>
         <div>
-          <a onClick={this.handleClick.bind(this)}>{value}</a>
+          <a onClick={this.handleClick.bind(this)}>{displayLinkText}</a>
           <DeploymentForm newDeployment={this.addDeployment.bind(this)} isGithub={this.state.isGithub}/>
           <DeploymentList deployments={this.state.deployments}/>
         </div>
