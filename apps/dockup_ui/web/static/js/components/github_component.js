@@ -5,7 +5,6 @@ class GithubComponent extends Component {
     super(props);
     this.handleUserNameChange = this.handleUserNameChange.bind(this);
     this.handleRepositoryChange = this.handleRepositoryChange.bind(this);
-
   }
 
   handleUserNameChange(event) {
@@ -15,7 +14,6 @@ class GithubComponent extends Component {
   handleRepositoryChange(event) {
     this.props.repository(event.target.value);
   }
-
 
   render() {
     return (

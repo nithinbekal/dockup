@@ -22,16 +22,11 @@ class DeploymentForm extends Component {
   displayHelpText() {
     if (!this.state.username || !this.state.repository || !this.state.branch) {
       return "Please enter a github project and branch to deploy";
-    } else if ((this.props.isGithub == false) && (isAnyFieldEmpty(!this.state.url, !this.state.branch))) {
-      return "Please enter a project url and branch to deploy";
-    } else {
-      return displayDeployMessage(this.props.isGithub, isAnyFieldEmpty(this.state.url,
-                                                                       this.state.branch),
-                                                                       this.state.url,
-                                                                       this.state.branch,
-                                                                       this.state.username,
-                                                                       this.state.repository);
     }
+    if ((this.props.isGithub == false) && (isAnyFieldEmpty(!this.state.url, !this.state.branch))) {
+      return "Please enter a project url and branch to deploy";
+    }
+    return displayDeployMessage(this.props, this.state);
   }
 
   handleClick(e) {
@@ -78,11 +73,10 @@ class DeploymentForm extends Component {
 const isAnyFieldEmpty = function(field1, field2) {
   return (field1 || field2);
 }
-const displayDeployMessage = function(isGithub, isAnyFieldEmpty, url, branch, username, repository) {
-  if ((isGithub == false) && isAnyFieldEmpty) {
-    return `Click the Deploy button to deploy ${url} with branch: ${branch}`
-  } else {
-    return `Click the Deploy button to deploy https://github.com/${username}/${repository} with branch: ${branch}`;
+const displayDeployMessage = function(props, state) {
+  if ((props.isGithub == false) && isAnyFieldEmpty(state.url, state.branch)) {
+    return `Click the Deploy button to deploy ${state.url} with branch: ${state.branch}`
   }
+  return `Click the Deploy button to deploy https://github.com/${state.username}/${state.repository} with branch: ${state.branch}`;
 }
 export default DeploymentForm
