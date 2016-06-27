@@ -57,12 +57,12 @@ defmodule Dockup.Container do
     end
   end
 
-  def running_in_docker? do
-    File.exists? "/.dockerenv"
+  def running_in_docker?(file \\ File) do
+    file.exists? "/.dockerenv"
   end
 
   def ensure_docker_sock_mounted do
-    "/var/run/docker.sock" = volume_host_dir("volume_host_dir")
+    "/var/run/docker.sock" = volume_host_dir("/var/run/docker.sock")
   end
 
   def start_containers(project_id, command \\ Dockup.Command) do
@@ -76,18 +76,18 @@ defmodule Dockup.Container do
   end
 
   def project_ports(project_id, container \\ __MODULE__) do
-    get_project_container_ids(project_id)
-    |> Enum.map(fn(x) -> {container.get_ip_of_container(x), container.get_ports_on_container(x)} end)
+    container.container_ids(project_id)
+    |> Enum.map(fn(x) -> {container.container_ip(x), container.container_ports(x)} end)
   end
 
-  def get_project_container_ids(project_id, command \\ Dockup.Command) do
+  def container_ids(project_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker-compose", ["-p", "#{project_id}", "ps", "-q"], Dockup.Project.project_dir(project_id))
     out
     |> String.split("\n")
     |> Enum.map(fn(x) -> String.strip(x) end)
   end
 
-  def get_ports_on_container(container_id, command \\ Dockup.Command) do
+  def container_ports(container_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker", ["inspect",
       "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'",
       container_id])
@@ -98,7 +98,7 @@ defmodule Dockup.Container do
     |> Enum.filter(fn(x) -> String.length(x) > 0 end)
   end
 
-  def get_ip_of_container(container_id, command \\ Dockup.Command) do
+  def container_ip(container_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker", ["inspect",
       "--format='{{.NetworkSettings.IPAddress}}'", container_id])
     String.strip out
@@ -112,6 +112,8 @@ defmodule Dockup.Container do
     volume_host_dir(Dockup.Configs.workdir)
   end
 
+  # If running in a docker container, returns the directory on host,
+  # given a mounted volume on the container
   defp volume_host_dir(container_dir, command \\ Dockup.Command) do
     if running_in_docker? do
       {container_id, 0} = command.run("hostname", [])

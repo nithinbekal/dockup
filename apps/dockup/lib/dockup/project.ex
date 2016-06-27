@@ -52,7 +52,7 @@ defmodule Dockup.Project do
     container.start_containers(project_id)
     ips_ports = container.project_ports(project_id)
     nginx_config.write_config(project_id, ips_ports)
-    #container.reload_nginx
+    container.reload_nginx
   end
 
   def get_status(url) do

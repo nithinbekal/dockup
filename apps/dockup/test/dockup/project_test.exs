@@ -91,4 +91,22 @@ defmodule Dockup.ProjectTest do
     end
     assert Dockup.Project.project_dir_on_host("foo", FakeContainer) == "/fake_workdir/foo"
   end
+
+  test "start starts all containers, writes nginx config and restarts nginx container" do
+    defmodule FakeContainerForStarting do
+      def start_containers("foo"), do: send self, :containers_started
+      def project_ports("foo"), do: "fake_ports"
+      def reload_nginx, do: send self, :nginx_reloaded
+    end
+
+    defmodule FakeNginxConfigForStarting do
+      def write_config("foo", "fake_ports"), do: send self, :nginx_config_written
+    end
+
+    Dockup.Project.start("foo", FakeContainerForStarting, FakeNginxConfigForStarting)
+
+    assert_received :containers_started
+    assert_received :nginx_config_written
+    assert_received :nginx_reloaded
+  end
 end
