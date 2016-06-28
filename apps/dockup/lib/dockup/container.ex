@@ -58,7 +58,8 @@ defmodule Dockup.Container do
   end
 
   def running_in_docker?(file \\ File) do
-    file.exists?("/.dockerenv")
+    # Do not consider docker container when running tests (for example in CI)
+    Mix.env != :test && file.exists?("/.dockerenv")
   end
 
   def docker_sock_mounted? do
