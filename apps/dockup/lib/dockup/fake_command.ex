@@ -7,6 +7,7 @@ defmodule Dockup.FakeCommand do
       ["-v"] => {"Docker version 1.8.1, build d12ea79", 0},
       ["kill", "-s", "HUP", "nginx"] => {"", 0},
       ["inspect", "--format='{{ range .Mounts }}{{ if eq .Destination \"workdir\" }}{{ .Source }}{{ end }}{{ end }}'", "fake_docker_container_id"] => {"/fake_work_dir_on_host", 0},
+      ["inspect", "--format='{{ range .Mounts }}{{ if eq .Destination \"/home/travis/build/code-mancers/dockup/apps/dockup/test/fixtures/workdir\" }}{{ .Source }}{{ end }}{{ end }}'", "fake_docker_container_id"] => {"/fake_work_dir_on_host", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "fake_container_1"] => {"1.2.3.4", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "fake_container_2"] => {"1.2.3.5", 0},
       ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "fake_container_1"] => {"80/tcp\n4000/tcp", 0},
