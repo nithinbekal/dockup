@@ -2,6 +2,7 @@ defmodule Dockup.DockerComposeConfigTest do
   use ExUnit.Case, async: true
 
   test "write_config for static_site writes docker-compose.yml with an nginx service" do
+    File.mkdir_p! Dockup.Project.project_dir("foo")
     Dockup.DockerComposeConfig.write_config(:static_site, "foo")
     {:ok, content} = File.read(Path.join(Dockup.Project.project_dir("foo"), "docker-compose.yml"))
     assert content ==
