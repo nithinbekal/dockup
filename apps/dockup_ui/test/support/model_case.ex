@@ -25,7 +25,7 @@ defmodule DockupUi.ModelCase do
     end
   end
 
-  setup tags do
+  setup _tags do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(DockupUi.Repo)
 
     :ok
