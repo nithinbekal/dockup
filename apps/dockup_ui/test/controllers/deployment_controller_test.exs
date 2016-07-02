@@ -2,14 +2,12 @@ defmodule DockupUi.DeploymentControllerTest do
   use DockupUi.ConnCase
   import DockupUi.Factory
 
-  alias DockupUi.Deployment
-
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   test "lists all entries on index", %{conn: conn} do
-    deployment = create(:deployment)
+    deployment = insert(:deployment)
     conn = get conn, deployment_path(conn, :index)
     assert json_response(conn, 200)["data"] == [
       %{
@@ -22,7 +20,7 @@ defmodule DockupUi.DeploymentControllerTest do
   end
 
   test "shows chosen resource", %{conn: conn} do
-    deployment = create(:deployment)
+    deployment = insert(:deployment)
     conn = get conn, deployment_path(conn, :show, deployment)
     assert json_response(conn, 200)["data"] == %{
       "id" => deployment.id,
@@ -39,11 +37,11 @@ defmodule DockupUi.DeploymentControllerTest do
   end
 
   test "create renders resource when DeployService runs fine", %{conn: conn} do
-    deployment = create(:deployment, %{id: 1})
+    deployment = insert(:deployment, %{id: 1})
 
     defmodule FakeDeployService do
       def run(%{"foo" => "bar"}) do
-        {:ok, Repo.get(Deployment, 1)}
+        {:ok, Repo.get(DockupUi.Deployment, 1)}
       end
     end
 
@@ -55,7 +53,7 @@ defmodule DockupUi.DeploymentControllerTest do
   test "create renders errors on model when DeployService fails", %{conn: conn} do
     defmodule FakeFailingDeployService do
       def run(%{}) do
-        {:error, Deployment.changeset(%Deployment{}, %{})}
+        {:error, DockupUi.Deployment.changeset(%DockupUi.Deployment{}, %{})}
       end
     end
 
