@@ -1,4 +1,6 @@
-FROM elixir:1.2.5
+FROM elixir:1.3
+
+RUN apt-get update
 
 # Install docker and docker-compose
 RUN curl -sSL https://get.docker.com/ | sh
@@ -16,7 +18,6 @@ ENV PORT 4000
 RUN mix local.hex --force
 RUN mix local.rebar --force
 RUN mix deps.get --force --only prod
-RUN mix compile
 
 # Precompile DockupUi assets
 WORKDIR /dockup/apps/dockup_ui
@@ -24,9 +25,11 @@ RUN wget -qO- https://deb.nodesource.com/setup_6.x | bash
 RUN apt-get update && apt-get install -y nodejs build-essential
 RUN npm install
 RUN ./node_modules/brunch/bin/brunch build --production
-RUN mix phoenix.digest
+
+# Install pg client
+RUN apt-get install -y postgresql-client-9.4
 
 WORKDIR /dockup
 EXPOSE 4000
+CMD ["./scripts/run"]
 
-CMD ["mix", "phoenix.server"]

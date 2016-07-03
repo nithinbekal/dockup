@@ -6,6 +6,8 @@ defmodule DockupUi do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    Dockup.run_preflight_checks
+
     children = [
       # Start the endpoint when the application starts
       supervisor(DockupUi.Endpoint, []),

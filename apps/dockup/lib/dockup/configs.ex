@@ -1,4 +1,5 @@
 defmodule Dockup.Configs do
+  require Logger
   import DefMemo
 
   defmemo workdir do
@@ -24,10 +25,10 @@ defmodule Dockup.Configs do
   end
 
   defp ensure_dir_exists(dir) do
-    File.mkdir_p dir
-    case File.exists?(dir) do
-      true -> dir
-      _ -> raise "Invalid directory #{dir}"
+    unless File.exists?(dir) do
+      Logger.info "Creating missing directory: #{dir}"
+      File.mkdir_p! dir
     end
+    dir
   end
 end

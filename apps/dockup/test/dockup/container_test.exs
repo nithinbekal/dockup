@@ -167,7 +167,7 @@ defmodule Dockup.ContainerTest do
 
   test "container_ports returns a list of exposed ports inside the container" do
     defmodule ContainerPortCommand do
-      def run("docker", ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "container1"]) do
+      def run("docker", ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{if $val}}{{$key}}\n{{end}}{{end}}'", "container1"]) do
         out = "   80/tcp\n4000/tcp\n   "
         {out, 0}
       end
@@ -179,7 +179,7 @@ defmodule Dockup.ContainerTest do
 
   test "container_ports returns an empy list if no ports are exposed" do
     defmodule ContainerNoPortCommand do
-      def run("docker", ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "container1"]) do
+      def run("docker", ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{if $val}}{{$key}}\n{{end}}{{end}}'", "container1"]) do
         out = "  "
         {out, 0}
       end

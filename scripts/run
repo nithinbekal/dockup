@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mix compile &&
+cd apps/dockup_ui &&
+mix phoenix.digest &&
+cd ../.. &&
+mix do ecto.create, ecto.migrate &&
+mix phoenix.server

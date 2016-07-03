@@ -38,10 +38,11 @@ defmodule Dockup.Project do
   # and they return 200.
   def wait_till_up(urls, http \\ __MODULE__, interval \\ 3000) do
     urls
-    |> Enum.map(fn {_port, url} -> {url, 200}  end)
+    |> Enum.map(fn {_port, _proxy, url} -> {url, 200}  end)
     |> Enum.each(fn {url, response} ->
       # Retry 10 times in an interval of 3 seconds
       retry 10 in interval do
+        Logger.info "Checking if #{url} returns http satus #{response}"
         ^response = http.get_status(url)
       end
     end)
@@ -51,8 +52,9 @@ defmodule Dockup.Project do
   def start(project_id, container \\ Dockup.Container, nginx_config \\ Dockup.NginxConfig) do
     container.start_containers(project_id)
     ips_ports = container.project_ports(project_id)
-    nginx_config.write_config(project_id, ips_ports)
+    port_urls = nginx_config.write_config(project_id, ips_ports)
     container.reload_nginx
+    port_urls
   end
 
   def get_status(url) do

@@ -1,0 +1,28 @@
+dockup_web:
+  build: .
+  environment:
+    - POSTGRES_PASSWORD=secret
+    - POSTGRES_USER=user
+    - POSTGRES_HOST=db
+    # Domain where dockup is running.
+    # For example:
+    #- DOCKUP_DOMAIN=192.168.50.4.xip.io
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    # "workdir" is a directory on your host where projects will be cloned
+    # This is mounted on the docker container at /dockup/workdir
+    - workdir:/dockup/workdir
+    # "nginx_config_dir" is a directory on your host where projects will be cloned
+    # This is mounted on the docker container at /dockup/nginx_config_dir
+    - nginx_config_dir:/dockup/nginx_config_dir
+  ports:
+    # Exposes port 4000 of docker as port 4000 on host
+    - "4000:4000"
+  links:
+    - db
+
+db:
+  image: postgres:9.4
+  environment:
+    - POSTGRES_PASSWORD=secret
+    - POSTGRES_USER=user

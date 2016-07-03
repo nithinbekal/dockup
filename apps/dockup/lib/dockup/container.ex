@@ -90,7 +90,7 @@ defmodule Dockup.Container do
 
   def container_ports(container_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker", ["inspect",
-      "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'",
+      "--format='{{range $key, $val := .NetworkSettings.Ports}}{{if $val}}{{$key}}\n{{end}}{{end}}'",
       container_id])
     out #  "   80/tcp\n4000/tcp\n   "
     |> String.strip # "80/tcp\n4000/tcp"
@@ -106,24 +106,32 @@ defmodule Dockup.Container do
   end
 
   defmemo nginx_config_dir_on_host do
-    volume_host_dir(Dockup.Configs.nginx_config_dir)
+    ensure_volume_host_dir_exists(Dockup.Configs.nginx_config_dir)
   end
 
   defmemo workdir_on_host do
-    volume_host_dir(Dockup.Configs.workdir)
+    ensure_volume_host_dir_exists(Dockup.Configs.workdir)
   end
 
   # If running in a docker container, returns the directory on host,
   # given a mounted volume on the container
-  defp volume_host_dir(container_dir, command \\ Dockup.Command) do
+  defp volume_host_dir(container_dir) do
     if running_in_docker? do
-      {container_id, 0} = command.run("hostname", [])
-      {host_dir, 0} = command.run("docker", ["inspect",
+      {container_id, 0} = Dockup.Command.run("hostname", [])
+      {host_dir, 0} = Dockup.Command.run("docker", ["inspect",
         "--format='{{ range .Mounts }}{{ if eq .Destination \"#{container_dir}\" }}{{ .Source }}{{ end }}{{ end }}'",
         container_id])
       host_dir
     else
       container_dir
     end
+  end
+
+  defp ensure_volume_host_dir_exists(dir) do
+    host_dir = volume_host_dir(dir) |> String.trim
+    if host_dir == "" do
+      raise "Cannot find volume mount destination: #{dir}"
+    end
+    host_dir
   end
 end

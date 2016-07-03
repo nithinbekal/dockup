@@ -17,11 +17,17 @@ Other goals:
 
 ## Installation
 
-Make sure you have docker, then run:
+Make sure you have docker and docker-compose first:
 
-    docker run -v /var/run/docker.sock:/var/run/docker.sock -p 4000:4000 codemancers/dockup
+    git clone https://github.com/code-mancers/dockup && cd dockup
+    # Configure your dockup instance by modifying docker-compose.yml
+    docker-compose up
 
 Dockup is now accessible at `http://<host>:4000`
+
+TODO: Above steps can be simplified if postgres can be installed inside
+dockup's docker container. After that, dockup can be started by simply
+running one docker container using `docker run`
 
 ## Development
 
@@ -73,7 +79,7 @@ Refer `apps/dockup/config/config.exs` to see the list of configurations
 
 ## API
 
-### /deploy
+### /deployments
 
 This API endpoint is used to deploy a dockerized app.
 

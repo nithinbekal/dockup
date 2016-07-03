@@ -22,12 +22,14 @@ defmodule Dockup.DeployJob do
     error in MatchError ->
       Logger.error (inspect error)
       error_callback(callback, repository, branch, (inspect error))
-    _ ->
-      message = "An unexpected error occured when deploying #{project_identifier}"
+    e ->
+      message = "An unexpected error occured when deploying #{project_identifier} : #{e.message}"
       Logger.error message
       error_callback(callback, repository, branch, message)
   end
 
+  # Given a project type and project id, deploys the app and
+  # and returns a list : [{<port>, <http://ip_on_docker:port>, <haikunated_url>} ...]
   def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)
 
   def deploy(:static_site, project_id, config_generator, project) do

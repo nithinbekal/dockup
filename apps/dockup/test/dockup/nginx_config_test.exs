@@ -25,7 +25,7 @@ defmodule Dockup.NginxConfigTest do
     }
 
     server {
-      listen 80;
+      listen 4000;
       server_name haikunated_url;
 
       location / {
@@ -40,15 +40,15 @@ defmodule Dockup.NginxConfigTest do
 
   test "generate nginx config string for proxy-passing ports" do
     urls_proxies =
-      [{"http://fake_host:3000", "shy-surf-3571.127.0.0.1.xip.io"},
-       {"http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"},
-       {"http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
+      [{"3000", "http://fake_host:3000", "shy-surf-3571.127.0.0.1.xip.io"},
+       {"3001", "http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"},
+       {"8080", "http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
 
     nginx_config_content =
       Dockup.NginxConfig.config_proxy_passing_port(urls_proxies)
     assert nginx_config_content == """
     server {
-      listen 80;
+      listen 3000;
       server_name shy-surf-3571.127.0.0.1.xip.io;
 
       location / {
@@ -58,7 +58,7 @@ defmodule Dockup.NginxConfigTest do
     }
 
     server {
-      listen 80;
+      listen 3001;
       server_name long-flower-2811.127.0.0.1.xip.io;
 
       location / {
@@ -68,7 +68,7 @@ defmodule Dockup.NginxConfigTest do
     }
 
     server {
-      listen 80;
+      listen 8080;
       server_name crimson-meadow-2.127.0.0.1.xip.io;
 
       location / {

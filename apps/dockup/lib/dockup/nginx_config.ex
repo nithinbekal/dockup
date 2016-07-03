@@ -18,9 +18,9 @@ defmodule Dockup.NginxConfig do
 
   # accepts a urls_proxies tuple.
   # e.g.
-  # [{"http://fake_host:3000", "shy-surf-3571.127.0.0.1.xip.io"}
-  # {"http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"}
-  # {"http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
+  # [{"3000", "http://fake_host:3000", "shy-surf-3571.127.0.0.1.xip.io"}
+  # {"3001", "http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"}
+  # {"8080", "http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
   def config_proxy_passing_port(urls_proxies) do
     Enum.map(urls_proxies, &proxy_passing_port&1) |> Enum.join("\n")
   end
@@ -35,7 +35,7 @@ defmodule Dockup.NginxConfig do
     Logger.info "Writing nginx config to serve #{project_id}"
     ports_urls = Enum.reduce(ips_ports, [], fn({ip, ports}, acc) ->
       acc ++ Enum.map(ports, fn(port) ->
-        {"http://#{ip}:#{port}", haikunator.haikunated_url}
+        {port, "http://#{ip}:#{port}", haikunator.haikunated_url}
       end)
     end)
     config = config_proxy_passing_port(ports_urls)
@@ -43,10 +43,10 @@ defmodule Dockup.NginxConfig do
     ports_urls
   end
 
-  def proxy_passing_port({proxy, url}) do
+  def proxy_passing_port({port, proxy, url}) do
     """
     server {
-      listen 80;
+      listen #{port};
       server_name #{url};
 
       location / {
