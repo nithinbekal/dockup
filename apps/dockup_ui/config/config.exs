@@ -26,3 +26,5 @@ import_config "#{Mix.env}.exs"
 config :phoenix, :generators,
   migration: true,
   binary_id: false
+
+config :dockup_ui, ecto_repos: [DockupUi.Repo]
