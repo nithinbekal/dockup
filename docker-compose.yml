@@ -8,6 +8,8 @@ dockup_web:
     # For example:
     #- DOCKUP_DOMAIN=192.168.50.4.xip.io
   volumes:
+    - /usr/bin/docker:/usr/bin/docker
+    - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
     - /var/run/docker.sock:/var/run/docker.sock
     # "workdir" is a directory on your host where projects will be cloned
     # This is mounted on the docker container at /dockup/workdir
