@@ -42,7 +42,8 @@ defmodule DockupUi.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:ex_machina, "~> 1.0", only: [:test, :dev]},
      {:gettext, "~> 0.11"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:dockup, in_umbrella: true}]
   end
 
   # Aliases are shortcut or tasks specific to the current project.
