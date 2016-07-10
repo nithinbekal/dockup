@@ -6,6 +6,11 @@ defmodule DockupUi do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    # call these checks before starting the app.
+    if List.keymember?(Application.loaded_applications, :dockup, 0) do
+      Dockup.run_preflight_checks
+    end
+
     children = [
       # Start the endpoint when the application starts
       supervisor(DockupUi.Endpoint, []),
