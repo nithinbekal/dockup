@@ -17,17 +17,7 @@ Other goals:
 
 ## Installation
 
-Make sure you have docker and docker-compose first:
-
-    git clone https://github.com/code-mancers/dockup && cd dockup
-    # Configure your dockup instance by modifying docker-compose.yml
-    docker-compose up
-
-Dockup is now accessible at `http://<host>:4000`
-
-TODO: Above steps can be simplified if postgres can be installed inside
-dockup's docker container. After that, dockup can be started by simply
-running one docker container using `docker run`
+TODO
 
 ## Development
 
