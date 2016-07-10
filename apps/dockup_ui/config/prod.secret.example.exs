@@ -10,4 +10,7 @@ config :dockup_ui, DockupUi.Endpoint,
 config :dockup_ui, DockupUi.Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "dockup_ui_prod",
+  username: (System.get_env("POSTGRES_USER") || "postgres"),
+  password: (System.get_env("POSTGRES_PASSWORD") || ""),
+  hostname: (System.get_env("POSTGRES_HOST") || "localhost"),
   pool_size: 20

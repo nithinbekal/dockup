@@ -21,7 +21,12 @@ defmodule DockupUi.DeployService do
     :ok
   end
 
-  defp prepare_deployment_params(%{git_url: repo, branch: branch, callback_url: callback_url}) do
-    {repo, branch, {Dockup.Callbacks.Webhook, callback_url}}
+  defp prepare_deployment_params(%{id: id, git_url: repo, branch: branch, callback_url: callback_url}) do
+    callback = if is_nil(callback_url) do
+      Dockup.Callbacks.Null
+    else
+      Dockup.Callbacks.Webhook
+    end
+    {id, repo, branch, {callback, callback_url}}
   end
 end

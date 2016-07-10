@@ -7,3 +7,5 @@ erl_crash.dump
 /nginx_config_dir
 /workdir
 /mix.lock
+/test/fixtures/workdir
+/test/fixtures/nginx_config_dir

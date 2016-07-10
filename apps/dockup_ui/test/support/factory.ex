@@ -1,7 +1,7 @@
 defmodule DockupUi.Factory do
   use ExMachina.Ecto, repo: DockupUi.Repo
 
-  def factory(:deployment) do
+  def deployment_factory do
     %DockupUi.Deployment{
       git_url: "https://github.com/code-mancers/dockup.git",
       branch: "master",
