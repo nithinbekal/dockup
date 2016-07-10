@@ -1,10 +1,17 @@
 defmodule DockupUi do
   use Application
+  require Logger
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
+
+    # call these checks before starting the app.
+    if List.keymember?(Application.loaded_applications, :dockup, 0) do
+      Logger.debug "running preflight checks"
+      Dockup.run_preflight_checks
+    end
 
     children = [
       # Start the endpoint when the application starts
