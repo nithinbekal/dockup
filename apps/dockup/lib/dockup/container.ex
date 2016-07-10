@@ -117,7 +117,7 @@ defmodule Dockup.Container do
   # given a mounted volume on the container
   defp volume_host_dir(container_dir) do
     if running_in_docker? do
-      {container_id, 0} = Dockup.Command.run("hostname", [])
+      container_id = dockup_container_id
       {host_dir, 0} = Dockup.Command.run("docker", ["inspect",
         "--format='{{ range .Mounts }}{{ if eq .Destination \"#{container_dir}\" }}{{ .Source }}{{ end }}{{ end }}'",
         container_id])
@@ -133,5 +133,16 @@ defmodule Dockup.Container do
       raise "Cannot find volume mount destination: #{dir}"
     end
     host_dir
+  end
+
+  defp dockup_container_id do
+    # This is the only dependable way to get the container ID from within a
+    # docker container. The problem with using `hostname` is that it can be
+    # overridden when running the container.
+    # We use :os.cmd because this is a trusted command and we don't want
+    # to create a long argument list.
+    :os.cmd('cat /proc/self/cgroup | grep -o  -e "docker-.*.scope" | head -n 1 | sed "s/docker-\\(.*\\).scope/\\\\1/"')
+    |> to_string
+    |> String.trim
   end
 end
