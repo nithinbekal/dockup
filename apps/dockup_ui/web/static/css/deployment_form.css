@@ -1,0 +1,9 @@
+.github-swap-link {
+  padding-left: 1em;
+  cursor: pointer;
+}
+
+.remove-lr-border {
+  border-left: none;
+  border-right: none;
+}
