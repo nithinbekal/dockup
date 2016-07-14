@@ -1,82 +1,62 @@
 import React, {Component} from 'react';
 import ReactDOM from "react-dom";
-import GithubComponent from './github_component';
-import GenericComponent from './generic_component';
+import GithubUrlInput from './github_url_input';
+import GitUrlInput from './git_url_input';
 
 class DeploymentForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      repository: "",
-      url: "",
-      branch: ""
+      gitUrl: "",
+      branch: "",
+      gitUrlType: "github" // Can be either "github" or "generic"
     }
-    this.handleUserNameChange = this.handleUserNameChange.bind(this);
-    this.handleRepositoryChange = this.handleRepositoryChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleUrlChange = this.handleUrlChange.bind(this);
-    this.handleBranchChange = this.handleBranchChange.bind(this);
   }
 
-  displayHelpText() {
-    if (!this.state.username || !this.state.repository || !this.state.branch) {
-      return "Please enter a github project and branch to deploy";
-    }
-    if ((this.props.isGithub == false) && (isAnyFieldEmpty(!this.state.url, !this.state.branch))) {
-      return "Please enter a project url and branch to deploy";
-    }
-    return displayDeployMessage(this.props, this.state);
-  }
-
-  handleClick(e) {
-    const newElement = {name: `${this.state.username}/${this.state.repository}`,
-                        logs: '111',
-                        url: "http://one.com"};
-    this.props.newDeployment(newElement);
+  handleDeployClick(e) {
+    e.preventDefault();
+    this.props.newDeployment({url: this.state.gitUrl, branch: this.state.branch});
   }
 
   handleUrlChange(url) {
-    this.setState({url: url});
+    this.setState({gitUrl: url});
   }
 
-  handleBranchChange(event) {
-    this.setState({branch: event.target.value});
+  handleBranchChange(branch) {
+    this.setState({branch: branch});
   }
 
-  handleUserNameChange(username) {
-    this.setState({username: username});
+  handleUrlTypeChange(urlType) {
+    this.setState({gitUrl: ""});
+    this.setState({gitUrlType: urlType});
   }
 
-  handleRepositoryChange(repository) {
-    this.setState({repository: repository});
+  validInputs() {
+    return (this.state.gitUrl.length > 0 && this.state.branch.length > 0);
   }
 
+  renderGitUrlInput() {
+    if(this.state.gitUrlType == "github") {
+      return <GithubUrlInput onUrlChange={this.handleUrlChange.bind(this)} onUrlTypeChange={this.handleUrlTypeChange.bind(this)}/>;
+    } else {
+      return <GitUrlInput onUrlChange={this.handleUrlChange.bind(this)} onUrlTypeChange={this.handleUrlTypeChange.bind(this)}/>;
+    }
+  }
 
   render() {
     return (
       <div>
-      { this.props.isGithub ? <GithubComponent username={this.handleUserNameChange}
-        repository={this.handleRepositoryChange} /> : <GenericComponent
-        url={this.handleUrlChange}  />}
-      <br />
-      <b>
-      Branch :
-        </b>
-        <input name="branch" class="form-control" onChange={this.handleBranchChange} className="form-control" />
-        <div>{this.displayHelpText()}</div>
-        <button name="deploy" onClick={this.handleClick} disabled={(!this.state.username || !this.state.repository)} className="btn btn-primary">Deploy</button>
-        </div>
+        <form role="form">
+          {this.renderGitUrlInput()}
+          <div className="form-group">
+            <label htmlFor="branch">Branch</label>
+            <input className="form-control" id="branch" onChange={(event) => { this.handleBranchChange(event.target.value)}} className="form-control"/>
+          </div>
+          <button type="submit" onClick={this.handleDeployClick.bind(this)} disabled={!this.validInputs()} className="btn btn-default">Deploy</button>
+        </form>
+      </div>
     )
   }
 }
-const isAnyFieldEmpty = function(field1, field2) {
-  return (field1 || field2);
-}
-const displayDeployMessage = function(props, state) {
-  if ((props.isGithub == false) && isAnyFieldEmpty(state.url, state.branch)) {
-    return `Click the Deploy button to deploy ${state.url} with branch: ${state.branch}`
-  }
-  return `Click the Deploy button to deploy https://github.com/${state.username}/${state.repository} with branch: ${state.branch}`;
-}
+
 export default DeploymentForm
