@@ -9,7 +9,7 @@ defmodule DockupUi.DeployService do
       changeset <- Deployment.changeset(%Deployment{status: "deploying"}, deployment_params),
       {:ok, deployment} <- Repo.insert(changeset),
       :ok <- deploy_project(deploy_job, deployment),
-      :ok <- DockupUi.DeploymentChannel.deployment_event("new_deployment", deployment)
+      :ok <- DockupUi.DeploymentChannel.new_deployment(deployment)
     do
       {:ok, deployment}
     end

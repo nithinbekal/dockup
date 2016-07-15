@@ -28,7 +28,8 @@ class DeploymentForm extends Component {
 
   handleClick(e) {
     const newElement = {name: `${this.state.username}/${this.state.repository}`, logs: '111', url: "http://one.com"};
-    this.props.newDeployment(newElement);
+    //this.props.newDeployment(newElement);
+    // TODO: Replace this with actual AJAX request to create deployment
   }
 
   render() {

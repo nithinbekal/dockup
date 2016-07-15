@@ -13,7 +13,7 @@ defmodule DockupUi.DeploymentStatusUpdateService do
     with \
       changeset <- Deployment.changeset(deployment, %{status: status}),
       {:ok, deployment} <- Repo.update(changeset),
-      :ok <- DockupUi.DeploymentChannel.deployment_event("update_status", deployment)
+      :ok <- DockupUi.DeploymentChannel.update_deployment_status(deployment)
     do
       {:ok, deployment}
     end
