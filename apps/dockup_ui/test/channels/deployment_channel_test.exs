@@ -3,21 +3,21 @@ defmodule DockupUi.DeploymentChannelTest do
 
   alias DockupUi.DeploymentChannel
 
-  test "new_deployment broadcasts a new_deployment event" do
+  test "new_deployment broadcasts a deployment_created event" do
     DockupUi.Endpoint.subscribe("deployments:all")
     DeploymentChannel.new_deployment(%{foo: "bar"})
     assert_receive %Phoenix.Socket.Broadcast{
       topic: "deployments:all",
-      event: "new_deployment",
+      event: "deployment_created",
       payload: %{foo: "bar"}}
   end
 
-  test "update_deployment_status broadcasts an update_status event" do
+  test "update_deployment_status broadcasts an status_updated event" do
     DockupUi.Endpoint.subscribe("deployments:all")
     DeploymentChannel.update_deployment_status(%{foo: "bar"})
     assert_receive %Phoenix.Socket.Broadcast{
       topic: "deployments:all",
-      event: "update_status",
+      event: "status_updated",
       payload: %{foo: "bar"}}
   end
 end

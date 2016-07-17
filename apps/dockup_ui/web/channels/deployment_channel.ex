@@ -2,11 +2,11 @@ defmodule DockupUi.DeploymentChannel do
   use Phoenix.Channel
 
   def new_deployment(deployment) do
-    deployment_event("new_deployment", deployment)
+    deployment_event("deployment_created", deployment)
   end
 
   def update_deployment_status(deployment) do
-    deployment_event("update_status", deployment)
+    deployment_event("status_updated", deployment)
   end
 
   #============== Internal API below=============#
