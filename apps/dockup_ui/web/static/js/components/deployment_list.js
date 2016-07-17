@@ -37,7 +37,7 @@ class DeploymentList extends Component {
   }
 
   addDeployment(deployment) {
-    // TODO
+    this.setState({deployments: this.state.deployments.concat(deployment)});
   }
 
   connectToDeploymentsChannel() {
