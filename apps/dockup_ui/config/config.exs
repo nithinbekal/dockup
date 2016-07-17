@@ -13,6 +13,11 @@ config :dockup_ui, DockupUi.Endpoint,
   pubsub: [name: DockupUi.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :dockup_ui, OAuth.GitHub,
+  client_id: System.get_env("GITHUB_CLIENT_ID"),
+  client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
+  redirect_uri: System.get_env("GITHUB_REDIRECT_URI")
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -19,6 +19,14 @@ defmodule DockupUi.Router do
     get "/", PageController, :index
   end
 
+  scope "/oauth", DockupUi do
+    pipe_through :browser
+
+    get "/:provider", OAuthController, :index
+    get "/:provider/callback", OAuthController, :callback
+    delete "/logout", OAuthController, :delete
+  end
+
   scope "/api", DockupUi do
     pipe_through :api
 

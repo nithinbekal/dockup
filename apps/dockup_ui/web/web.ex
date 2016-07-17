@@ -52,6 +52,7 @@ defmodule DockupUi.Web do
       import DockupUi.Router.Helpers
       import DockupUi.ErrorHelpers
       import DockupUi.Gettext
+      import DockupUi.Session, only: [current_user_name: 1]
     end
   end
 
