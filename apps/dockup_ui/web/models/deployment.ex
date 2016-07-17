@@ -1,6 +1,8 @@
 defmodule DockupUi.Deployment do
   use DockupUi.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :git_url, :branch, :callback_url, :status]}
+
   schema "deployments" do
     field :git_url, :string
     field :branch, :string
@@ -11,7 +13,7 @@ defmodule DockupUi.Deployment do
   end
 
   @required_fields ~w(git_url branch)
-  @optional_fields ~w(callback_url)
+  @optional_fields ~w(callback_url status)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

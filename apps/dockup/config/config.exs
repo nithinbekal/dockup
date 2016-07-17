@@ -4,12 +4,9 @@ use Mix.Config
 
 # All configurations are assumed to be strings
 config :dockup,
-  port: "8000",
-  bind: "0.0.0.0",
   workdir: "workdir",
   cache_container: "cache",
   cache_volume: "/cache",
-  github_webhook_secret: nil,
   command_module: Dockup.ShellCommand,
   nginx_config_dir: "nginx_config_dir",
   domain: "127.0.0.1.xip.io"

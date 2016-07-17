@@ -8,7 +8,6 @@ use Mix.Config
 # Configures the endpoint
 config :dockup_ui, DockupUi.Endpoint,
   url: [host: "localhost"],
-  root: Path.dirname(__DIR__),
   secret_key_base: "n3+zKFQryan438UU2PO1Ypr97ty+a/xjAevgs9i5UtyR5In1sU1CaSes5Zi2jsSv",
   render_errors: [accepts: ~w(html json)],
   pubsub: [name: DockupUi.PubSub,
@@ -27,3 +26,5 @@ import_config "#{Mix.env}.exs"
 config :phoenix, :generators,
   migration: true,
   binary_id: false
+
+config :dockup_ui, ecto_repos: [DockupUi.Repo]

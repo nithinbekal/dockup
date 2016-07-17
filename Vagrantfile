@@ -3,7 +3,7 @@
 
 Vagrant.configure(2) do |config|
 
-  config.vm.network "forwarded_port", guest: 4000, host: 4000
+  config.vm.network "private_network", ip: "192.168.50.4"
 
   config.vm.box = "ubuntu/trusty64"
   config.vm.provision "shell", inline: <<-SHELL
@@ -15,6 +15,16 @@ Vagrant.configure(2) do |config|
     sudo apt-get update
     sudo apt-get install -y esl-erlang
     sudo apt-get install -y elixir
+
+    # Install NodeJS and postgres for dockup_ui
+    sudo apt-get install -y postgresql
+    sudo apt-get install -y nodejs build-essential
+    wget -qO- https://deb.nodesource.com/setup_6.x | sudo bash
+
+    sudo -u postgres createuser -s vagrant
+    sudo sh -c "echo 'local all all trust' > /etc/postgresql/9.3/main/pg_hba.conf"
+    sudo sh -c "echo 'host all all 127.0.0.1/32 trust' >> /etc/postgresql/9.3/main/pg_hba.conf"
+    sudo service postgresql restart
 
     sudo apt-get install -y curl
 

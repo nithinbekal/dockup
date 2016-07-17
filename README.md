@@ -17,11 +17,7 @@ Other goals:
 
 ## Installation
 
-Make sure you have docker, then run:
-
-    docker run -v /var/run/docker.sock:/var/run/docker.sock -p 4000:4000 codemancers/dockup
-
-Dockup is now accessible at `http://<host>:4000`
+TODO
 
 ## Development
 
@@ -73,7 +69,7 @@ Refer `apps/dockup/config/config.exs` to see the list of configurations
 
 ## API
 
-### /deploy
+### /deployments
 
 This API endpoint is used to deploy a dockerized app.
 

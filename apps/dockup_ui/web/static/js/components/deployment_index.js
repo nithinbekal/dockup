@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import DeploymentForm from './deployment_form';
 import DeploymentList from './deployment_list';
-
 class DeploymentIndex extends Component {
   constructor(props) {
     super(props);
@@ -12,7 +11,6 @@ class DeploymentIndex extends Component {
 
   addDeployment(newDeployment) {
     let deploymentsArray = this.state.deployments;
-    // TODO: Add new deployment here
     deploymentsArray.push(newDeployment);
     this.setState({deployments: deploymentsArray});
   }

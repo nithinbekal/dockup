@@ -15,7 +15,7 @@ class DeploymentForm extends Component {
 
   handleDeployClick(e) {
     e.preventDefault();
-    this.props.newDeployment({url: this.state.gitUrl, branch: this.state.branch});
+    this.props.newDeployment({gitUrl: this.state.gitUrl, branch: this.state.branch});
   }
 
   handleUrlChange(url) {
