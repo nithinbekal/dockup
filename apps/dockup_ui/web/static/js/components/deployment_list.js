@@ -42,11 +42,11 @@ class DeploymentList extends Component {
 
   connectToDeploymentsChannel() {
     let channel = DockupUiSocket.getDeploymentsChannel();
-    channel.on("update_status", ({id, status}) => {
+    channel.on("status_updated", ({id, status}) => {
       this.updateDeploymentStatus(id, status);
     })
 
-    channel.on("new_deployment", (deployment) => {
+    channel.on("deployment_created", (deployment) => {
       this.addDeployment(deployment);
     })
   }
