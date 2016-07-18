@@ -1,47 +1,61 @@
 import React, {Component} from 'react';
+import GithubUrlInput from './github_url_input';
+import GitUrlInput from './git_url_input';
 
 class DeploymentForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      repository: "",
+      gitUrl: "",
+      branch: "",
+      gitUrlType: "github" // Can be either "github" or "generic"
     }
   }
 
-  handleUserNameChange(event) {
-    this.setState({username: event.target.value});
+  handleDeployClick(e) {
+    e.preventDefault();
+    this.props.newDeployment({gitUrl: this.state.gitUrl, branch: this.state.branch});
   }
 
-  handleRepositoryChange(event) {
-    this.setState({repository: event.target.value});
+  handleUrlChange(url) {
+    this.setState({gitUrl: url});
   }
 
-  displayHelpText() {
-    if (!this.state.username || !this.state.repository) {
-      return "Please enter a github project to deploy";
+  handleBranchChange(branch) {
+    this.setState({branch: branch});
+  }
+
+  handleUrlTypeChange(urlType) {
+    this.setState({gitUrl: ""});
+    this.setState({gitUrlType: urlType});
+  }
+
+  validInputs() {
+    return (this.state.gitUrl.length > 0 && this.state.branch.length > 0);
+  }
+
+  renderGitUrlInput() {
+    if(this.state.gitUrlType == "github") {
+      return <GithubUrlInput onUrlChange={this.handleUrlChange.bind(this)} onUrlTypeChange={this.handleUrlTypeChange.bind(this)}/>;
     } else {
-      return `Click the Deploy button to deploy https://github.com/${this.state.username}/${this.state.repository}`;
+      return <GitUrlInput onUrlChange={this.handleUrlChange.bind(this)} onUrlTypeChange={this.handleUrlTypeChange.bind(this)}/>;
     }
-  }
-
-  handleClick(e) {
-    const newElement = {name: `${this.state.username}/${this.state.repository}`, logs: '111', url: "http://one.com"};
-    //this.props.newDeployment(newElement);
-    // TODO: Replace this with actual AJAX request to create deployment
   }
 
   render() {
     return (
-      <div>https://github.com/
-        <input name="username" onChange={this.handleUserNameChange.bind(this)}/>/
-        <input name="repository" onChange={this.handleRepositoryChange.bind(this)} />
-        <button name="deploy" onClick={this.handleClick.bind(this)} disabled={(!this.state.username || !this.state.repository)}>Deploy</button>
-        <br />
-        <div>{this.displayHelpText()}</div>
-        <br/>
+      <div>
+        <form role="form">
+          {this.renderGitUrlInput()}
+          <div className="form-group">
+            <label htmlFor="branch">Branch</label>
+            <input className="form-control" id="branch" onChange={(event) => { this.handleBranchChange(event.target.value)}} className="form-control"/>
+          </div>
+          <button type="submit" onClick={this.handleDeployClick.bind(this)} disabled={!this.validInputs()} className="btn btn-default">Deploy</button>
+        </form>
       </div>
     )
   }
 }
+
 export default DeploymentForm

@@ -65,11 +65,11 @@ class DeploymentList extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.deployments.map((deployment) => {
+            {this.props.deployments.map((deployment) => {
               return (
                 <tr key={deployment.id}>
                   <td>{deployment.id}</td>
-                  <td>{deployment.git_url}</td>
+                  <td>{deployment.gitUrl}</td>
                   <td>{deployment.branch}</td>
                   <td>{deployment.status}</td>
                 </tr>
