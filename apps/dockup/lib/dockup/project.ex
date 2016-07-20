@@ -57,6 +57,10 @@ defmodule Dockup.Project do
     port_urls
   end
 
+  def stop(project_id, container \\ Dockup.Container) do
+    container.stop_containers(project_id)
+  end
+
   def get_status(url) do
     HTTPotion.get(url).status_code
   end
