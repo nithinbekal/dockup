@@ -7,7 +7,6 @@ defmodule Dockup.DeployJob do
 
   def perform(project_identifier, repository, branch, callback, project \\ Dockup.Project,
                deploy_job \\ __MODULE__) do
-    #project_id = project.project_id(repository, branch)
     project_id = to_string(project_identifier)
     project.clone_repository(project_id, repository, branch)
 
