@@ -7,6 +7,8 @@ defmodule DockupUi.DeploymentStatusUpdateService do
   def run(status, deployment_id) when is_integer(deployment_id) do
     deployment = Repo.get!(Deployment, deployment_id)
     run(status, deployment)
+  rescue
+    _ -> {:error, deployment_id}
   end
 
   def run(status, deployment) do

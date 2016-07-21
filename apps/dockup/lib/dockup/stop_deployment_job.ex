@@ -1,7 +1,7 @@
 defmodule Dockup.StopDeploymentJob do
   require Logger
 
-  def spawn_process({id, callback}) do
+  def spawn_process(id, callback) do
     spawn(fn -> perform(id, callback) end)
   end
 
