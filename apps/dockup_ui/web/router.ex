@@ -23,5 +23,6 @@ defmodule DockupUi.Router do
     pipe_through :api
 
     resources "/deployments", DeploymentController, only: [:create, :index, :show, :delete]
+    post "/deployments/:id/stop", DeploymentController, :stop
   end
 end

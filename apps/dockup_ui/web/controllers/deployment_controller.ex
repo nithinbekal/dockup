@@ -32,7 +32,7 @@ defmodule DockupUi.DeploymentController do
     render(conn, "show.json", deployment: deployment)
   end
 
-  def delete(conn, %{"id" => id}) do
+  def stop(conn, %{"id" => id}) do
     stop_deployment_service = conn.assigns[:stop_deployment_service] || StopDeploymentService
     case stop_deployment_service.run(String.to_integer(id)) do
       :ok ->
