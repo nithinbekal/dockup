@@ -22,7 +22,7 @@ defmodule Dockup.DockerComposeConfig do
   defp config(:jekyll_site, _project_id) do
     """
     site:
-      image: .
+      build: .
       ports:
         - 4000
     """

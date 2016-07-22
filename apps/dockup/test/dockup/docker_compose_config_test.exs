@@ -23,7 +23,7 @@ defmodule Dockup.DockerComposeConfigTest do
     assert content ==
       """
       site:
-        image: .
+        build: .
         ports:
           - 4000
       """
