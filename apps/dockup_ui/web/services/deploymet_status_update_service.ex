@@ -1,21 +1,24 @@
 defmodule DockupUi.DeploymentStatusUpdateService do
   alias DockupUi.{
     Deployment,
-    Repo
+    Repo,
+    DeploymentChannel
   }
 
-  def run(status, deployment_id) when is_integer(deployment_id) do
+  def run(status, deployment_id, channel \\ DeploymentChannel)
+
+  def run(status, deployment_id, channel) when is_integer(deployment_id) do
     deployment = Repo.get!(Deployment, deployment_id)
-    run(status, deployment)
+    run(status, deployment, channel)
   rescue
     _ -> {:error, deployment_id}
   end
 
-  def run(status, deployment) do
+  def run(status, deployment, channel) do
     with \
       changeset <- Deployment.changeset(deployment, %{status: status}),
       {:ok, deployment} <- Repo.update(changeset),
-      :ok <- DockupUi.DeploymentChannel.update_deployment_status(deployment)
+      :ok <- channel.update_deployment_status(deployment)
     do
       {:ok, deployment}
     end
