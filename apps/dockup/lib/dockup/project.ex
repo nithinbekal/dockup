@@ -27,6 +27,7 @@ defmodule Dockup.Project do
   def project_type(project_id) do
     project_dir = project_dir(project_id)
     cond do
+      jekyll_site?(project_dir) -> :jekyll_site
       static_site?(project_dir) -> :static_site
       # Rails etc can be auto detected in the future
       true -> :unknown
@@ -67,5 +68,10 @@ defmodule Dockup.Project do
 
   defp static_site?(project_dir) do
     File.exists? "#{project_dir}/index.html"
+  end
+
+  defp jekyll_site?(project_dir) do
+    gemfile_path = Path.join(project_dir, "Gemfile")
+    File.exists?(gemfile_path) && File.read!(gemfile_path) =~ "jekyll"
   end
 end

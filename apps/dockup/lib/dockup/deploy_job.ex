@@ -31,14 +31,16 @@ defmodule Dockup.DeployJob do
   # and returns a list : [{<port>, <http://ip_on_docker:port>, <haikunated_url>} ...]
   def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)
 
-  def deploy(:static_site, project_id, config_generator, project) do
-    Logger.info "Deploying static site #{project_id}"
-    config_generator.generate(:static_site, project_id)
-    project.start(project_id)
+  def deploy(:unknown, _project_id, _config_generator, _project) do
+    Logger.info "Deploying using custom configuration is yet to be turned on."
+    #Logger.info "Deploying using custom configuration #{project_id}"
+    #project.start(project_id)
   end
 
-  def deploy(_, app_id, _, _) do
-    raise DockupException, "Don't know how to deploy #{app_id}"
+  def deploy(type, project_id, config_generator, project) do
+    Logger.info "Deploying #{type} #{project_id}"
+    config_generator.generate(type, project_id)
+    project.start(project_id)
   end
 
   # Callback handlers

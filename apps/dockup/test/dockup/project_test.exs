@@ -46,6 +46,37 @@ defmodule Dockup.ProjectTest do
     end
   end
 
+  test "project_type returns :jekyll_site if project uses jekyll gem" do
+    project_id = "auto/detect/jekyll"
+    project_dir = Dockup.Project.project_dir project_id
+    File.mkdir_p project_dir
+    File.write! "#{project_dir}/Gemfile", """
+      source "https://rubygems.org"
+
+      gem 'capistrano', '~> 2.15'
+      gem 'jekyll'
+    """
+
+    assert Dockup.Project.project_type(project_id) == :jekyll_site
+    File.rm_rf Dockup.Configs.workdir <> "/auto"
+  end
+
+  test "project_type returns :jekyll_site if project uses jekyll gem and index.html file is also present" do
+    project_id = "auto/detect/jekyll"
+    project_dir = Dockup.Project.project_dir project_id
+    File.mkdir_p project_dir
+    File.write! "#{project_dir}/Gemfile", """
+      source "https://rubygems.org"
+
+      gem 'capistrano', '~> 2.15'
+      gem 'jekyll'
+    """
+    File.touch "#{project_dir}/index.html"
+
+    assert Dockup.Project.project_type(project_id) == :jekyll_site
+    File.rm_rf Dockup.Configs.workdir <> "/auto"
+  end
+
   test "project_type returns :static_site if index.html is found" do
     project_id = "auto/detect/static"
     project_dir = Dockup.Project.project_dir project_id
