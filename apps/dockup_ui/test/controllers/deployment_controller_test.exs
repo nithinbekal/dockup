@@ -64,4 +64,28 @@ defmodule DockupUi.DeploymentControllerTest do
       "git_url" => ["can't be blank"]
     }
   end
+
+  test "stop responds with 204 when deployment can be stopped", %{conn: conn} do
+    defmodule FakeStopDeploymentService do
+      def run(123) do
+        :ok
+      end
+    end
+
+    conn = conn |> assign(:stop_deployment_service, FakeStopDeploymentService)
+    conn = post conn, "/api/deployments/123/stop"
+    assert response(conn, 204)
+  end
+
+  test "stop responds with 422 when deployment cannot be stopped", %{conn: conn} do
+    defmodule FailingStopDeploymentService do
+      def run(123) do
+        {:error, nil}
+      end
+    end
+
+    conn = conn |> assign(:stop_deployment_service, FailingStopDeploymentService)
+    conn = post conn, "/api/deployments/123/stop"
+    assert response(conn, 422)
+  end
 end

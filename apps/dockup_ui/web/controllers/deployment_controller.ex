@@ -3,7 +3,8 @@ defmodule DockupUi.DeploymentController do
 
   alias DockupUi.{
     Deployment,
-    DeployService
+    DeployService,
+    StopDeploymentService
   }
 
   def index(conn, _params) do
@@ -29,5 +30,17 @@ defmodule DockupUi.DeploymentController do
   def show(conn, %{"id" => id}) do
     deployment = Repo.get!(Deployment, id)
     render(conn, "show.json", deployment: deployment)
+  end
+
+  def stop(conn, %{"id" => id}) do
+    stop_deployment_service = conn.assigns[:stop_deployment_service] || StopDeploymentService
+    case stop_deployment_service.run(String.to_integer(id)) do
+      :ok ->
+        conn
+        |> send_resp(:no_content, "")
+      {:error, _} ->
+        conn
+        |> send_resp(:unprocessable_entity, "")
+    end
   end
 end
