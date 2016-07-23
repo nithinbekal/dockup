@@ -20,7 +20,7 @@ defmodule Dockup.DockerfileConfigTest do
       EXPOSE 4000
 
       ENTRYPOINT ["jekyll"]
-      CMD ["serve"]
+      CMD ["serve", "--host=0.0.0.0"]
       """
   end
 end

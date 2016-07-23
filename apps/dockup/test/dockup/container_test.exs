@@ -165,56 +165,44 @@ defmodule Dockup.ContainerTest do
       == ["container1", "container2", "container3"]
   end
 
-  test "container_ports returns a list of exposed ports inside the container" do
+  test "port_mappings_for_container returns a list of port mappings inside the container" do
     defmodule ContainerPortCommand do
-      def run("docker", ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{if $val}}{{$key}}\n{{end}}{{end}}'", "container1"]) do
-        out = "   80/tcp\n4000/tcp\n   "
+      def run("docker", ["inspect", "--format='{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}}:{{(index $conf 0).HostPort}}\n{{end}}{{end}}'", "container1"]) do
+        out = "   80/tcp:3227\n4000/tcp:3228\n   "
         {out, 0}
       end
     end
 
-    assert Dockup.Container.container_ports("container1", ContainerPortCommand)
-      == ["80", "4000"]
+    assert Dockup.Container.port_mappings_for_container("container1", ContainerPortCommand)
+      == [{"80", "3227"}, {"4000", "3228"}]
   end
 
-  test "container_ports returns an empy list if no ports are exposed" do
+  test "port_mappings_for_container returns an empy list if no ports are exposed" do
     defmodule ContainerNoPortCommand do
-      def run("docker", ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{if $val}}{{$key}}\n{{end}}{{end}}'", "container1"]) do
+      def run("docker", ["inspect", "--format='{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}}:{{(index $conf 0).HostPort}}\n{{end}}{{end}}'", "container1"]) do
         out = "  "
         {out, 0}
       end
     end
 
-    assert Dockup.Container.container_ports("container1", ContainerNoPortCommand)
+    assert Dockup.Container.port_mappings_for_container("container1", ContainerNoPortCommand)
       == []
   end
 
-  test "container_ip returns the IP of the docker container" do
-    defmodule ContainerIpCommand do
-      def run("docker", ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "container1"]) do
-        out = "fake_ip"
-        {out, 0}
-      end
-    end
-
-    assert Dockup.Container.container_ip("container1", ContainerIpCommand)
-      == "fake_ip"
-  end
-
-  test "project_ports retrns ips and ports of the containers of the project" do
+  test "port_mappings retrns services and port details of the containers of the project" do
     defmodule FakeIpPortsContainer do
       def container_ids("foo") do
         ["container1", "container2"]
       end
 
-      def container_ip("container1"), do: "fake_ip1"
-      def container_ip("container2"), do: "fake_ip2"
+      def port_mappings_for_container("container1"), do: [{"80", "3227"}, {"4000", "3228"}]
+      def port_mappings_for_container("container2"), do: []
 
-      def container_ports("container1"), do: ["80", "4000"]
-      def container_ports("container2"), do: []
+      def container_service_name("container1"), do: "web"
+      def container_service_name("container2"), do: "worker"
     end
 
-    assert Dockup.Container.project_ports("foo", FakeIpPortsContainer)
-      == [{"fake_ip1", ["80", "4000"]}, {"fake_ip2", []}]
+    assert Dockup.Container.port_mappings("foo", FakeIpPortsContainer)
+      ==  %{"web" => [{"80", "3227"}, {"4000", "3228"}], "worker" => []}
   end
 end

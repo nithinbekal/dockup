@@ -18,39 +18,75 @@ defmodule Dockup.NginxConfig do
 
   # accepts a urls_proxies tuple.
   # e.g.
-  # [{"3000", "http://fake_host:3000", "shy-surf-3571.127.0.0.1.xip.io"}
-  # {"3001", "http://fake_host:3001", "long-flower-2811.127.0.0.1.xip.io"}
-  # {"8080", "http://fake_host2:8080", "crimson-meadow-2.127.0.0.1.xip.io"}]
-  def config_proxy_passing_port(urls_proxies) do
-    Enum.map(urls_proxies, &proxy_passing_port&1) |> Enum.join("\n")
+  # [{"host_port", "haikunated_url"}...]
+  def config_proxy_passing_port(proxy_urls) do
+    Enum.map(proxy_urls, &proxy_passing_port&1) |> Enum.join("\n")
   end
 
   def config_file(project_id) do
     Path.join(Dockup.Configs.nginx_config_dir, "#{project_id}.conf")
   end
 
-  # Given a project_id and docker ports, writes the nginx config to
+  # Given a project_id and docker port mappings, writes the nginx config to
   # proxy pass haikunated URLs to the docker ports
-  def write_config(project_id, ips_ports, haikunator \\ Dockup.Haikunator) do
+  # port_mappings should be of the format :
+  # %{"<service name>" => [{"<container_port>", <"host_port">}, ...], ...}
+  def write_config(project_id, port_mappings, haikunator \\ Dockup.Haikunator) do
     Logger.info "Writing nginx config to serve #{project_id}"
-    ports_urls = Enum.reduce(ips_ports, [], fn({ip, ports}, acc) ->
-      acc ++ Enum.map(ports, fn(port) ->
-        {port, "http://#{ip}:#{port}", haikunator.haikunated_url}
-      end)
-    end)
-    config = config_proxy_passing_port(ports_urls)
+
+    service_port_urls = generate_service_port_urls(port_mappings, haikunator)
+    proxy_urls = format_proxy_urls(service_port_urls)
+    config = config_proxy_passing_port(proxy_urls)
     File.write(config_file(project_id), config)
-    ports_urls
+    format_service_urls(service_port_urls)
   end
 
-  def proxy_passing_port({port, proxy, url}) do
+  defp generate_service_port_urls(port_mappings, haikunator) do
+    Enum.reduce(port_mappings, %{}, fn {service, ports}, acc ->
+      value = Enum.reduce(ports, [], fn {container_port, host_port}, acc_1 ->
+        acc_1 ++ [{container_port, host_port, haikunator.haikunated_url}]
+      end)
+      Map.merge acc, %{service => value}
+    end)
+  end
+
+  # service_port_urls is of the format:
+  # [{"service_name", [{"container_port", "host_port", "haikunated_url"},...]}, ...]
+  # returns:
+  # %{"<service name>" => [{"<container_port>", <"url">}, ...], ...}
+  defp format_service_urls(service_port_urls) do
+    Enum.reduce(service_port_urls, %{}, fn {service, port_details}, map_acc ->
+      if Enum.empty? port_details do
+        map_acc
+      else
+        value = Enum.reduce(port_details, [], fn {container_port, _, url}, acc ->
+          acc ++ [{container_port, url}]
+        end)
+        Map.merge map_acc, %{service => value}
+      end
+    end)
+  end
+
+  # service_port_urls is of the format:
+  # [{"service_name", [{"container_port", "host_port", "haikunated_url"},...]}, ...]
+  # returns:
+  # [{"host_port", "haikunated_url"}, ...]
+  defp format_proxy_urls(service_port_urls) do
+    Enum.reduce(service_port_urls, [], fn {service, port_details}, acc ->
+      acc ++ Enum.reduce(port_details, [], fn {_, host_port, url}, acc_1 ->
+        acc_1 ++ [{host_port, url}]
+      end)
+    end)
+  end
+
+  defp proxy_passing_port({port, url}) do
     """
     server {
-      listen #{port};
+      listen 80;
       server_name #{url};
 
       location / {
-        proxy_pass #{proxy};
+        proxy_pass http://0.0.0.0:#{port};
         proxy_set_header Host $host;
       }
     }

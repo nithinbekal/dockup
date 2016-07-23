@@ -76,9 +76,25 @@ defmodule Dockup.Container do
     command.run("docker-compose", ["-p", "#{project_id}", "stop"], Dockup.Project.project_dir(project_id))
   end
 
-  def project_ports(project_id, container \\ __MODULE__) do
+  # Returns a list of port mappings for each container in the format:
+  # %{"<service name>" => [{"<container_port>", <"host_port">}, ...], ...}
+  # This is used to generate an nginx config for the deployment.
+  def port_mappings(project_id, container \\ __MODULE__) do
     container.container_ids(project_id)
-    |> Enum.map(fn(x) -> {container.container_ip(x), container.container_ports(x)} end)
+    |> Enum.reduce(%{}, fn(x, acc) ->
+      map = %{container.container_service_name(x) => container.port_mappings_for_container(x)}
+      Map.merge(acc, map)
+    end)
+  end
+
+  def port_mappings_for_container(container_id, command \\ Dockup.Command) do
+    {out, 0} = command.run("docker", ["inspect",
+      "--format='{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}}:{{(index $conf 0).HostPort}}\n{{end}}{{end}}'",
+      container_id])
+    out #  "   80/tcp:3227\n4000/tcp:3228\n   "
+    |> String.strip # "80/tcp:3227\n4000/tcp:3228"
+    |> String.split("\n") # ["80/tcp:3227", "4000/tcp:3228"]
+    |> format_port_mapping # [{"80", "3227"}, {"4000", "3228"}]
   end
 
   def container_ids(project_id, command \\ Dockup.Command) do
@@ -88,29 +104,18 @@ defmodule Dockup.Container do
     |> Enum.map(fn(x) -> String.strip(x) end)
   end
 
-  def container_ports(container_id, command \\ Dockup.Command) do
-    {out, 0} = command.run("docker", ["inspect",
-      "--format='{{range $key, $val := .NetworkSettings.Ports}}{{if $val}}{{$key}}\n{{end}}{{end}}'",
-      container_id])
-    out #  "   80/tcp\n4000/tcp\n   "
-    |> String.strip # "80/tcp\n4000/tcp"
-    |> String.split("\n") # ["80/tcp", "4000/tcp"]
-    |> Enum.map(fn(x) -> String.split(x, "/") |> List.first end) # ["80", "4000"]
-    |> Enum.filter(fn(x) -> String.length(x) > 0 end)
-  end
-
-  def container_ip(container_id, command \\ Dockup.Command) do
-    {out, 0} = command.run("docker", ["inspect",
-      "--format='{{.NetworkSettings.IPAddress}}'", container_id])
-    String.strip out
-  end
-
   defmemo nginx_config_dir_on_host do
     ensure_volume_host_dir_exists(Dockup.Configs.nginx_config_dir)
   end
 
   defmemo workdir_on_host do
     ensure_volume_host_dir_exists(Dockup.Configs.workdir)
+  end
+
+  def container_service_name(container_id, command \\ Dockup.Command) do
+    {out, 0} = command.run("docker", ["inspect",
+      "{{index .Config.Labels \"com.docker.compose.service\"}}", container_id])
+    String.strip out
   end
 
   # If running in a docker container, returns the directory on host,
@@ -144,5 +149,14 @@ defmodule Dockup.Container do
     :os.cmd('cat /proc/self/cgroup | grep -o  -e "docker-.*.scope" | head -n 1 | sed "s/docker-\\(.*\\).scope/\\\\1/"')
     |> to_string
     |> String.trim
+  end
+
+  defp format_port_mapping([""]), do: []
+  defp format_port_mapping(ports) do
+    Enum.map(ports, fn(port) ->
+      # port_mapping is of format "80/tcp:3227"
+      map = Regex.named_captures(~r/(?<container_port>\d*)\/...:(?<host_port>\d*)/, port) # %{"container_port" => "80", "host_port" => "3227"}
+      {map["container_port"], map["host_port"]}
+    end)
   end
 end

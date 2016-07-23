@@ -127,7 +127,7 @@ defmodule Dockup.ProjectTest do
   test "start starts all containers, writes nginx config and restarts nginx container" do
     defmodule FakeContainerForStarting do
       def start_containers("foo"), do: send self, :containers_started
-      def project_ports("foo"), do: "fake_ports"
+      def port_mappings("foo"), do: "fake_ports"
       def reload_nginx, do: send self, :nginx_reloaded
     end
 
