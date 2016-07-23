@@ -18,7 +18,7 @@ defmodule Dockup.NginxConfig do
 
   # accepts a urls_proxies tuple.
   # e.g.
-  # [{"host_port", "haikunated_url"}...]
+  # [{"container_ip", "host_port", "haikunated_url"},...]
   def config_proxy_passing_port(proxy_urls) do
     Enum.map(proxy_urls, &proxy_passing_port&1) |> Enum.join("\n")
   end
@@ -70,7 +70,7 @@ defmodule Dockup.NginxConfig do
   # service_port_urls is of the format:
   # %{"service_name" => {"container_ip", [{"container_port", "host_port", "haikunated_url"},...]}, ...}
   # returns:
-  # [{"host_port", "haikunated_url"}, ...]
+  # [{"container_ip", "host_port", "haikunated_url"}, ...]
   defp format_proxy_urls(service_port_urls) do
     Enum.reduce(service_port_urls, [], fn {_service, {ip, port_details}}, acc ->
       acc ++ Enum.reduce(port_details, [], fn {container_port, _host_port, url}, acc_1 ->
