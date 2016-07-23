@@ -72,7 +72,7 @@ defmodule Dockup.NginxConfig do
   # returns:
   # [{"host_port", "haikunated_url"}, ...]
   defp format_proxy_urls(service_port_urls) do
-    Enum.reduce(service_port_urls, [], fn {service, port_details}, acc ->
+    Enum.reduce(service_port_urls, [], fn {_service, port_details}, acc ->
       acc ++ Enum.reduce(port_details, [], fn {_, host_port, url}, acc_1 ->
         acc_1 ++ [{host_port, url}]
       end)
