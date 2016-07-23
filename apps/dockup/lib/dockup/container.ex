@@ -114,7 +114,7 @@ defmodule Dockup.Container do
 
   def container_service_name(container_id, command \\ Dockup.Command) do
     {out, 0} = command.run("docker", ["inspect",
-      "{{index .Config.Labels \"com.docker.compose.service\"}}", container_id])
+      "--format='{{index .Config.Labels \"com.docker.compose.service\"}}'", container_id])
     String.strip out
   end
 
