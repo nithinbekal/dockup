@@ -27,6 +27,7 @@ defmodule Dockup.Project do
   def project_type(project_id) do
     project_dir = project_dir(project_id)
     cond do
+      jekyll_site?(project_dir) -> :jekyll_site
       static_site?(project_dir) -> :static_site
       # Rails etc can be auto detected in the future
       true -> :unknown
@@ -36,23 +37,24 @@ defmodule Dockup.Project do
   # Waits until the urls all return expected HTTP status.
   # Currently, assuming that URLs are for static sites
   # and they return 200.
-  def wait_till_up(urls, http \\ __MODULE__, interval \\ 3000) do
-    urls
-    |> Enum.map(fn {_port, _proxy, url} -> {url, 200}  end)
+  def wait_till_up(service_urls, http \\ __MODULE__, interval \\ 3000) do
+    service_urls
+    |> Enum.reduce([], fn {_service, port_urls}, acc -> acc ++ Enum.map(port_urls, fn {_port, url} -> {url, 200}  end) end)
     |> Enum.each(fn {url, response} ->
       # Retry 10 times in an interval of 3 seconds
       retry 10 in interval do
         Logger.info "Checking if #{url} returns http satus #{response}"
         ^response = http.get_status(url)
       end
+      Logger.info "URL #{url} seem up because they respond with #{response}."
     end)
-    Logger.info "URLs #{inspect urls} seem up because they respond with 200."
   end
 
   def start(project_id, container \\ Dockup.Container, nginx_config \\ Dockup.NginxConfig) do
     container.start_containers(project_id)
-    ips_ports = container.project_ports(project_id)
-    port_urls = nginx_config.write_config(project_id, ips_ports)
+    port_mappings = container.port_mappings(project_id)
+    port_urls = nginx_config.write_config(project_id, port_mappings)
+    # TODO: Invoke callback with event: ("urls_assigned", port_urls)
     container.reload_nginx
     port_urls
   end
@@ -67,5 +69,10 @@ defmodule Dockup.Project do
 
   defp static_site?(project_dir) do
     File.exists? "#{project_dir}/index.html"
+  end
+
+  defp jekyll_site?(project_dir) do
+    gemfile_path = Path.join(project_dir, "Gemfile")
+    File.exists?(gemfile_path) && File.read!(gemfile_path) =~ "jekyll"
   end
 end
