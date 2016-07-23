@@ -177,6 +177,18 @@ defmodule Dockup.ContainerTest do
       == [{"80", "3227"}, {"4000", "3228"}]
   end
 
+  test "container_ip returns the IP of the docker container" do
+    defmodule ContainerIpCommand do
+      def run("docker", ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "container1"]) do
+        out = "fake_ip"
+        {out, 0}
+      end
+    end
+
+    assert Dockup.Container.container_ip("container1", ContainerIpCommand)
+      == "fake_ip"
+  end
+
   test "port_mappings_for_container returns an empy list if no ports are exposed" do
     defmodule ContainerNoPortCommand do
       def run("docker", ["inspect", "--format='{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}}:{{(index $conf 0).HostPort}}\n{{end}}{{end}}'", "container1"]) do
@@ -200,9 +212,12 @@ defmodule Dockup.ContainerTest do
 
       def container_service_name("container1"), do: "web"
       def container_service_name("container2"), do: "worker"
+
+      def container_ip("container1"), do: "fake_ip1"
+      def container_ip("container2"), do: "fake_ip2"
     end
 
     assert Dockup.Container.port_mappings("foo", FakeIpPortsContainer)
-      ==  %{"web" => [{"80", "3227"}, {"4000", "3228"}], "worker" => []}
+      ==  %{"web" => {"fake_ip1", [{"80", "3227"}, {"4000", "3228"}]}, "worker" => {"fake_ip2", []}}
   end
 end

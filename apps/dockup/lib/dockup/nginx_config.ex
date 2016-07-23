@@ -30,7 +30,7 @@ defmodule Dockup.NginxConfig do
   # Given a project_id and docker port mappings, writes the nginx config to
   # proxy pass haikunated URLs to the docker ports
   # port_mappings should be of the format :
-  # %{"<service name>" => [{"<container_port>", <"host_port">}, ...], ...}
+  # %{"<service name>" => {"container_ip", [{"<container_port>", <"host_port">}, ...]}, ...}
   def write_config(project_id, port_mappings, haikunator \\ Dockup.Haikunator) do
     Logger.info "Writing nginx config to serve #{project_id}"
 
@@ -42,20 +42,20 @@ defmodule Dockup.NginxConfig do
   end
 
   defp generate_service_port_urls(port_mappings, haikunator) do
-    Enum.reduce(port_mappings, %{}, fn {service, ports}, acc ->
+    Enum.reduce(port_mappings, %{}, fn {service, {ip, ports}}, acc ->
       value = Enum.reduce(ports, [], fn {container_port, host_port}, acc_1 ->
         acc_1 ++ [{container_port, host_port, haikunator.haikunated_url}]
       end)
-      Map.merge acc, %{service => value}
+      Map.merge acc, %{service => {ip, value}}
     end)
   end
 
   # service_port_urls is of the format:
-  # [{"service_name", [{"container_port", "host_port", "haikunated_url"},...]}, ...]
+  # %{"service_name" => {"container_ip", [{"container_port", "host_port", "haikunated_url"},...]}, ...}
   # returns:
   # %{"<service name>" => [{"<container_port>", <"url">}, ...], ...}
   defp format_service_urls(service_port_urls) do
-    Enum.reduce(service_port_urls, %{}, fn {service, port_details}, map_acc ->
+    Enum.reduce(service_port_urls, %{}, fn {service, {_ip, port_details}}, map_acc ->
       if Enum.empty? port_details do
         map_acc
       else
@@ -68,25 +68,25 @@ defmodule Dockup.NginxConfig do
   end
 
   # service_port_urls is of the format:
-  # [{"service_name", [{"container_port", "host_port", "haikunated_url"},...]}, ...]
+  # %{"service_name" => {"container_ip", [{"container_port", "host_port", "haikunated_url"},...]}, ...}
   # returns:
   # [{"host_port", "haikunated_url"}, ...]
   defp format_proxy_urls(service_port_urls) do
-    Enum.reduce(service_port_urls, [], fn {_service, port_details}, acc ->
-      acc ++ Enum.reduce(port_details, [], fn {_, host_port, url}, acc_1 ->
-        acc_1 ++ [{host_port, url}]
+    Enum.reduce(service_port_urls, [], fn {_service, {ip, port_details}}, acc ->
+      acc ++ Enum.reduce(port_details, [], fn {container_port, _host_port, url}, acc_1 ->
+        acc_1 ++ [{ip, container_port, url}]
       end)
     end)
   end
 
-  defp proxy_passing_port({port, url}) do
+  defp proxy_passing_port({ip, port, url}) do
     """
     server {
       listen 80;
       server_name #{url};
 
       location / {
-        proxy_pass http://0.0.0.0:#{port};
+        proxy_pass http://#{ip}:#{port};
         proxy_set_header Host $host;
       }
     }

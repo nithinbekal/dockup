@@ -82,7 +82,7 @@ defmodule Dockup.Container do
   def port_mappings(project_id, container \\ __MODULE__) do
     container.container_ids(project_id)
     |> Enum.reduce(%{}, fn(x, acc) ->
-      map = %{container.container_service_name(x) => container.port_mappings_for_container(x)}
+      map = %{container.container_service_name(x) => {container.container_ip(x), container.port_mappings_for_container(x)}}
       Map.merge(acc, map)
     end)
   end
@@ -102,6 +102,12 @@ defmodule Dockup.Container do
     out
     |> String.split("\n")
     |> Enum.map(fn(x) -> String.strip(x) end)
+  end
+
+  def container_ip(container_id, command \\ Dockup.Command) do
+    {out, 0} = command.run("docker", ["inspect",
+      "--format='{{.NetworkSettings.IPAddress}}'", container_id])
+    String.strip out
   end
 
   defmemo nginx_config_dir_on_host do
