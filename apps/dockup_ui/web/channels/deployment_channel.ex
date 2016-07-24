@@ -5,8 +5,8 @@ defmodule DockupUi.DeploymentChannel do
     deployment_event("deployment_created", deployment)
   end
 
-  def update_deployment_status(deployment) do
-    deployment_event("status_updated", deployment)
+  def update_deployment_status(deployment, payload) do
+    deployment_event("status_updated", %{deployment: deployment, payload: payload})
   end
 
   #============== Internal API below=============#

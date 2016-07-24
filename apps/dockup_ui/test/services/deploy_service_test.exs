@@ -2,7 +2,7 @@ defmodule DeployServiceTest do
   use DockupUi.ModelCase, async: true
 
   defmodule FakeDeployJob do
-    def spawn_process(_params) do
+    def spawn_process(_params, _callback) do
       send self, :ran_deploy_job
       :ok
     end

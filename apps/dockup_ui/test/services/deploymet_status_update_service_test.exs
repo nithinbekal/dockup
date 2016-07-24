@@ -3,7 +3,7 @@ defmodule DeploymentStatusUpdateServiceTest do
   import DockupUi.Factory
 
   defmodule FakeChannel do
-    def update_deployment_status(_params) do
+    def update_deployment_status(_params, "fake_payload") do
       send self, :status_updated_on_channel
       :ok
     end
@@ -11,7 +11,7 @@ defmodule DeploymentStatusUpdateServiceTest do
 
   test "run returns {:ok, deployment} after updating the DB and broadcasting status update of deployment" do
     deployment = insert(:deployment)
-    {:ok, updated_deployment} = DockupUi.DeploymentStatusUpdateService.run("foo", deployment.id, FakeChannel)
+    {:ok, updated_deployment} = DockupUi.DeploymentStatusUpdateService.run("foo", deployment.id, "fake_payload", FakeChannel)
     assert updated_deployment.status == "foo"
     assert_received :status_updated_on_channel
   end
