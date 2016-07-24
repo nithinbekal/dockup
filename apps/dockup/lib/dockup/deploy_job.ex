@@ -16,7 +16,7 @@ defmodule Dockup.DeployJob do
     callback.("starting", nil)
     urls = deploy_job.deploy(project_type, project_id)
 
-    callback.("checking_urls", urls)
+    callback.("checking_urls", nil)
     project.wait_till_up(urls)
 
     callback.("started", urls)
