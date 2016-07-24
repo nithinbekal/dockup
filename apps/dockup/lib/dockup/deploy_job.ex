@@ -1,7 +1,7 @@
 defmodule Dockup.DeployJob do
   require Logger
 
-  def spawn_process(%{id: id, repository: repository, branch: branch}, callback) do
+  def spawn_process(%{id: id, git_url: repository, branch: branch}, callback) do
     spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
