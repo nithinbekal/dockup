@@ -13,10 +13,10 @@ defmodule DockupUi.Callback do
     DeploymentStatusUpdateService
   }
 
-  def lambda(deployment) do
+  def lambda(deployment, service \\ DeploymentStatusUpdateService) do
     fn
       event, payload ->
-        DeploymentStatusUpdateService.run(event, deployment.id, payload)
+        service.run(event, deployment.id, payload)
     end
   end
 end

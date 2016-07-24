@@ -2,6 +2,8 @@ defmodule DockupUi.DeploymentStatusUpdateService do
   # This module is responsible for updating the status of the deployment
   # in the DB as well as broadcasting the status update over the websocket.
 
+  require Logger
+
   alias DockupUi.{
     Deployment,
     Repo,
@@ -14,7 +16,9 @@ defmodule DockupUi.DeploymentStatusUpdateService do
     deployment = Repo.get!(Deployment, deployment_id)
     run(status, deployment, payload, channel)
   rescue
-    _ -> {:error, deployment_id}
+    _ ->
+      Logger.error "Cannot update status: #{status} of deployment_id: #{deployment_id}"
+      {:error, deployment_id}
   end
 
   def run(status, deployment, payload, channel) do

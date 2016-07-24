@@ -54,7 +54,6 @@ defmodule Dockup.Project do
     container.start_containers(project_id)
     port_mappings = container.port_mappings(project_id)
     port_urls = nginx_config.write_config(project_id, port_mappings)
-    # TODO: Invoke callback with event: ("urls_assigned", port_urls)
     container.reload_nginx
     port_urls
   end
