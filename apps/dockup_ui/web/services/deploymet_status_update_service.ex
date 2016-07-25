@@ -17,9 +17,7 @@ defmodule DockupUi.DeploymentStatusUpdateService do
     run(status, deployment, payload, channel)
   rescue
     e ->
-      IO.inspect e
-      IO.puts e.message
-      Logger.error "Cannot update status: #{status} of deployment_id: #{deployment_id}"
+      Logger.error "Cannot update status: #{status} of deployment_id: #{deployment_id}. Error: #{inspect e}"
       {:error, deployment_id}
   end
 

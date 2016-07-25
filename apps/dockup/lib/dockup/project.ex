@@ -39,7 +39,7 @@ defmodule Dockup.Project do
   # and they return 200.
   def wait_till_up(service_urls, http \\ __MODULE__, interval \\ 3000) do
     service_urls
-    |> Enum.reduce([], fn {_service, port_urls}, acc -> acc ++ Enum.map(port_urls, fn {_port, url} -> {url, 200}  end) end)
+    |> Enum.reduce([], fn {_service, port_urls}, acc -> acc ++ Enum.map(port_urls, fn port_url_map -> {port_url_map["url"], 200}  end) end)
     |> Enum.each(fn {url, response} ->
       # Retry 10 times in an interval of 3 seconds
       retry 10 in interval do

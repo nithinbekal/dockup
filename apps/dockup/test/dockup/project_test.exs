@@ -106,7 +106,7 @@ defmodule Dockup.ProjectTest do
       end
     end
 
-    urls = %{"web" => [{"80", "dummy_url"}]}
+    urls = %{"web" => [%{"port" => "80", "url" => "dummy_url"}]}
     logs = capture_log(fn -> Dockup.Project.wait_till_up(urls, FakeHttp, 0) end)
     assert logs =~ "Attempt 1 failed"
     assert logs =~ "Attempt 2 failed"
