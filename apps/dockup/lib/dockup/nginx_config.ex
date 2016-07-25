@@ -53,14 +53,14 @@ defmodule Dockup.NginxConfig do
   # service_port_urls is of the format:
   # %{"service_name" => {"container_ip", [{"container_port", "host_port", "haikunated_url"},...]}, ...}
   # returns:
-  # %{"<service name>" => [{"<container_port>", <"url">}, ...], ...}
+  # %{"<service name>" => [%{"port" => "<container_port>", "url" => <"url">}, ...], ...}
   defp format_service_urls(service_port_urls) do
     Enum.reduce(service_port_urls, %{}, fn {service, {_ip, port_details}}, map_acc ->
       if Enum.empty? port_details do
         map_acc
       else
         value = Enum.reduce(port_details, [], fn {container_port, _, url}, acc ->
-          acc ++ [{container_port, url}]
+          acc ++ [%{"port" => container_port, "url" => url}]
         end)
         Map.merge map_acc, %{service => value}
       end

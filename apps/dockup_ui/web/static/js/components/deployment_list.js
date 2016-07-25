@@ -21,11 +21,16 @@ class DeploymentList extends Component {
     xhr.send();
   }
 
-  updateDeploymentStatus(id, status) {
+  updateDeploymentStatus(id, status, payload) {
     let found = false;
     let newDeployments = this.state.deployments.map((deployment) => {
       if(deployment.id == id) {
         deployment.status = status;
+        if(status == "checking_urls" || status == "started") {
+          deployment.urls = payload;
+        } else if(status == "deployment_failed") {
+          deployment.urls = null;
+        }
         found = true;
       }
       return deployment;
@@ -40,10 +45,18 @@ class DeploymentList extends Component {
     this.setState({deployments: this.state.deployments.concat(deployment)});
   }
 
+  renderDeploymentUrls(urls) {
+    if(urls) {
+      return JSON.stringify(urls);
+    } else {
+      return "-";
+    }
+  }
+
   connectToDeploymentsChannel() {
     let channel = DockupUiSocket.getDeploymentsChannel();
-    channel.on("status_updated", ({id, status}) => {
-      this.updateDeploymentStatus(id, status);
+    channel.on("status_updated", ({deployment, payload}) => {
+      this.updateDeploymentStatus(deployment.id, deployment.status, payload);
     })
 
     channel.on("deployment_created", (deployment) => {
@@ -62,6 +75,7 @@ class DeploymentList extends Component {
               <th>Git URL</th>
               <th>Branch</th>
               <th>Status</th>
+              <th>URLs</th>
             </tr>
           </thead>
           <tbody>
@@ -72,6 +86,7 @@ class DeploymentList extends Component {
                   <td>{deployment.git_url}</td>
                   <td>{deployment.branch}</td>
                   <td>{deployment.status}</td>
+                  <td>{this.renderDeploymentUrls(deployment.urls)}</td>
                 </tr>
               )
              })}

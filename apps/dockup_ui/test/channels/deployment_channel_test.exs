@@ -14,10 +14,11 @@ defmodule DockupUi.DeploymentChannelTest do
 
   test "update_deployment_status broadcasts an status_updated event" do
     DockupUi.Endpoint.subscribe("deployments:all")
-    DeploymentChannel.update_deployment_status(%{foo: "bar"})
+    DeploymentChannel.update_deployment_status(%{foo: "bar"}, "payload")
     assert_receive %Phoenix.Socket.Broadcast{
       topic: "deployments:all",
       event: "status_updated",
-      payload: %{foo: "bar"}}
+      payload: %{deployment: %{foo: "bar"}, payload: "payload"}
+    }
   end
 end
