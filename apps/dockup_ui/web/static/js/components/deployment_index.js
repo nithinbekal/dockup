@@ -10,4 +10,5 @@ const DeploymentIndex = () => {
     </div>
   )
 }
+
 export default DeploymentIndex
