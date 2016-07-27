@@ -15,7 +15,7 @@ class DeploymentForm extends Component {
 
   handleDeployClick(e) {
     e.preventDefault();
-    this.props.newDeployment({url: this.state.gitUrl, branch: this.state.branch});
+    // TODO: Replace this with actual AJAX request to create deployment
   }
 
   handleUrlChange(url) {

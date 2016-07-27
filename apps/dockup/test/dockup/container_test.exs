@@ -109,7 +109,13 @@ defmodule Dockup.ContainerTest do
       end
     end
 
-    logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxDoesNotExistCommand) end)
+    defmodule FakeContainer do
+      def nginx_config_dir_on_host do
+        "fake_dir_on_host"
+      end
+    end
+
+    logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxDoesNotExistCommand, FakeContainer) end)
     assert logs =~ "Nginx container not found."
     assert logs =~ "Trying to pull nginx image"
     assert logs =~ "Nginx pulled and started"
@@ -124,5 +130,94 @@ defmodule Dockup.ContainerTest do
 
     Dockup.Container.reload_nginx(NginxReloadCommand)
   end
-end
 
+  test "start_containers runs docker-compose up" do
+    defmodule StartContainersCommand do
+      def run("docker-compose", ["-p", "foo", "up", "-d"], dir) do
+        # Ensure command is run inside project directory
+        ^dir = Dockup.Project.project_dir("foo")
+      end
+    end
+    Dockup.Container.start_containers("foo", StartContainersCommand)
+  end
+
+  test "stop_containers runs docker-compose stop" do
+    defmodule StopContainersCommand do
+      def run("docker-compose", ["-p", "foo", "stop"], dir) do
+        # Ensure command is run inside project directory
+        ^dir = Dockup.Project.project_dir("foo")
+      end
+    end
+    Dockup.Container.stop_containers("foo", StopContainersCommand)
+  end
+
+  test "container_ids fetches docker container ids of docker-compose project" do
+    defmodule ContainerIdCommand do
+      def run("docker-compose", ["-p", "foo", "ps", "-q"], dir) do
+        # Ensure command is run inside project directory
+        ^dir = Dockup.Project.project_dir("foo")
+        out = "  container1  \n container2  \n  container3"
+        {out, 0}
+      end
+    end
+
+    assert Dockup.Container.container_ids("foo", ContainerIdCommand)
+      == ["container1", "container2", "container3"]
+  end
+
+  test "port_mappings_for_container returns a list of port mappings inside the container" do
+    defmodule ContainerPortCommand do
+      def run("docker", ["inspect", "--format='{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}}:{{(index $conf 0).HostPort}}\n{{end}}{{end}}'", "container1"]) do
+        out = "   80/tcp:3227\n4000/tcp:3228\n   "
+        {out, 0}
+      end
+    end
+
+    assert Dockup.Container.port_mappings_for_container("container1", ContainerPortCommand)
+      == [{"80", "3227"}, {"4000", "3228"}]
+  end
+
+  test "container_ip returns the IP of the docker container" do
+    defmodule ContainerIpCommand do
+      def run("docker", ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "container1"]) do
+        out = "fake_ip"
+        {out, 0}
+      end
+    end
+
+    assert Dockup.Container.container_ip("container1", ContainerIpCommand)
+      == "fake_ip"
+  end
+
+  test "port_mappings_for_container returns an empy list if no ports are exposed" do
+    defmodule ContainerNoPortCommand do
+      def run("docker", ["inspect", "--format='{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}}:{{(index $conf 0).HostPort}}\n{{end}}{{end}}'", "container1"]) do
+        out = "  "
+        {out, 0}
+      end
+    end
+
+    assert Dockup.Container.port_mappings_for_container("container1", ContainerNoPortCommand)
+      == []
+  end
+
+  test "port_mappings retrns services and port details of the containers of the project" do
+    defmodule FakeIpPortsContainer do
+      def container_ids("foo") do
+        ["container1", "container2"]
+      end
+
+      def port_mappings_for_container("container1"), do: [{"80", "3227"}, {"4000", "3228"}]
+      def port_mappings_for_container("container2"), do: []
+
+      def container_service_name("container1"), do: "web"
+      def container_service_name("container2"), do: "worker"
+
+      def container_ip("container1"), do: "fake_ip1"
+      def container_ip("container2"), do: "fake_ip2"
+    end
+
+    assert Dockup.Container.port_mappings("foo", FakeIpPortsContainer)
+      ==  %{"web" => {"fake_ip1", [{"80", "3227"}, {"4000", "3228"}]}, "worker" => {"fake_ip2", []}}
+  end
+end

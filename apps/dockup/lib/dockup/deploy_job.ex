@@ -1,56 +1,48 @@
 defmodule Dockup.DeployJob do
   require Logger
 
-  def spawn_process({repository, branch, callback}) do
-    spawn(fn -> perform(repository, branch, callback) end)
+  def spawn_process(%{id: id, git_url: repository, branch: branch}, callback) do
+    spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
-  def perform(repository, branch, callback, project \\ Dockup.Project,
-               nginx_config \\ Dockup.NginxConfig, container \\ Dockup.Container) do
-    project_id = project.project_id(repository, branch)
-    project.clone_repository(repository, branch)
+  def perform(project_identifier, repository, branch, callback \\ Dockup.DefaultCallback.lambda, project \\ Dockup.Project,
+               deploy_job \\ __MODULE__) do
+    project_id = to_string(project_identifier)
 
-    # Read config
-    # if config can't be read, do the following
-    urls = project.auto_detect_project_type(project_id)
-    |> deploy(project_id, nginx_config, container)
+    callback.("cloning_repo", nil)
+    project.clone_repository(project_id, repository, branch)
 
+    project_type = project.project_type(project_id)
+    callback.("starting", nil)
+    urls = deploy_job.deploy(project_type, project_id)
+
+    callback.("checking_urls", urls)
     project.wait_till_up(urls)
-    success_callback(callback, repository, branch, urls)
+
+    callback.("started", urls)
   rescue
     error in MatchError ->
       Logger.error (inspect error)
-      error_callback(callback, repository, branch, (inspect error))
+      callback.("deployment_failed", (inspect error))
     e ->
-      Logger.error e.message
-      error_callback(callback, repository, branch, e.message)
+      message = "An unexpected error occured when deploying #{project_identifier} : #{e.message}"
+      Logger.error message
+      callback.("deployment_failed", message)
   end
 
-  defp deploy(:static_site, project_id, nginx_config, container) do
-    Logger.info "Deploying static site #{project_id}"
-    url = nginx_config.write_config(:static_site, project_id)
-    container.reload_nginx
-    url
+  # Given a project type and project id, deploys the app and
+  # and returns a list : [{<port>, <http://ip_on_docker:port>, <haikunated_url>} ...]
+  def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)
+
+  def deploy(:unknown, _project_id, _config_generator, _project) do
+    Logger.info "Deploying using custom configuration is yet to be turned on."
+    #Logger.info "Deploying using custom configuration #{project_id}"
+    #project.start(project_id)
   end
 
-  defp deploy(_, app_id, _, _) do
-    raise DockupException, "Don't know how to deploy #{app_id}"
-  end
-
-  # Callback handlers
-  defp success_callback({callback_module, callback_args}, repository, branch, urls) do
-    callback_module.deployment_success(repository, branch, urls, callback_args)
-  rescue
-    e ->
-      Logger.error "An error occurred in the success callback: #{e.message}"
-  end
-
-  defp error_callback({callback_module, callback_args}, repository, branch, reason) do
-    callback_module.deployment_failure(repository, branch, reason, callback_args)
-  end
-
-  defp localtime do
-    {{year, month, day}, {hour, minute, second}} = :calendar.local_time
-    "#{year}-#{month}-#{day} #{hour}:#{minute}:#{second}"
+  def deploy(type, project_id, config_generator, project) do
+    Logger.info "Deploying #{type} #{project_id}"
+    config_generator.generate(type, project_id)
+    project.start(project_id)
   end
 end

@@ -2,8 +2,8 @@ defmodule Dockup.Project do
   require Logger
   import Dockup.Retry
 
-  def clone_repository(repository, branch, command \\ Dockup.Command) do
-    project_dir = project_id(repository, branch) |> project_dir
+  def clone_repository(project_id, repository, branch, command \\ Dockup.Command) do
+    project_dir = project_dir(project_id)
     Logger.info "Cloning #{repository} : #{branch} into #{project_dir}"
     File.rm_rf(project_dir)
     File.mkdir_p!(project_dir)
@@ -16,52 +16,62 @@ defmodule Dockup.Project do
       raise DockupException, "Cannot clone #{branch} of #{repository}. Error: #{error.message}"
   end
 
-  def project_id(repository, branch) do
-    {org, repo} = parse_repo_from_git_url(repository)
-    "#{org}/#{repo}/#{branch}"
-  end
-
   def project_dir(project_id) do
-    "#{Dockup.Configs.workdir}/#{project_id}"
+    Path.join(Dockup.Configs.workdir, project_id)
   end
 
-  def auto_detect_project_type(project_id) do
-    {:ok, cwd} = File.cwd
-    File.cd project_dir(project_id)
-    project_type = cond do
-      static_site? -> :static_site
+  def project_dir_on_host(project_id, container \\ Dockup.Container) do
+    Path.join(container.workdir_on_host, project_id)
+  end
+
+  def project_type(project_id) do
+    project_dir = project_dir(project_id)
+    cond do
+      jekyll_site?(project_dir) -> :jekyll_site
+      static_site?(project_dir) -> :static_site
       # Rails etc can be auto detected in the future
       true -> :unknown
     end
-    File.cd cwd
-    project_type
   end
 
   # Waits until the urls all return expected HTTP status.
   # Currently, assuming that URLs are for static sites
   # and they return 200.
-  def wait_till_up(urls, http \\ __MODULE__, interval \\ 3000) do
-    urls
-    |> Enum.map(fn {_port, url} -> {url, 200}  end)
+  def wait_till_up(service_urls, http \\ __MODULE__, interval \\ 3000) do
+    service_urls
+    |> Enum.reduce([], fn {_service, port_urls}, acc -> acc ++ Enum.map(port_urls, fn port_url_map -> {port_url_map["url"], 200}  end) end)
     |> Enum.each(fn {url, response} ->
       # Retry 10 times in an interval of 3 seconds
       retry 10 in interval do
+        Logger.info "Checking if #{url} returns http satus #{response}"
         ^response = http.get_status(url)
       end
+      Logger.info "URL #{url} seem up because they respond with #{response}."
     end)
-    Logger.info "URLs #{inspect urls} seem up because they respond with 200."
+  end
+
+  def start(project_id, container \\ Dockup.Container, nginx_config \\ Dockup.NginxConfig) do
+    container.start_containers(project_id)
+    port_mappings = container.port_mappings(project_id)
+    port_urls = nginx_config.write_config(project_id, port_mappings)
+    container.reload_nginx
+    port_urls
+  end
+
+  def stop(project_id, container \\ Dockup.Container) do
+    container.stop_containers(project_id)
   end
 
   def get_status(url) do
     HTTPotion.get(url).status_code
   end
 
-  defp parse_repo_from_git_url(git_url) do
-    %{"org" => org, "repo" => repo} = Regex.named_captures(~r/.*[:\/](?<org>.+)\/(?<repo>.+).git/, git_url)
-    {org, repo}
+  defp static_site?(project_dir) do
+    File.exists? "#{project_dir}/index.html"
   end
 
-  defp static_site? do
-    File.exists? "index.html"
+  defp jekyll_site?(project_dir) do
+    gemfile_path = Path.join(project_dir, "Gemfile")
+    File.exists?(gemfile_path) && File.read!(gemfile_path) =~ "jekyll"
   end
 end

@@ -2,7 +2,7 @@ defmodule DockupUi.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", DockupUi.RoomChannel
+   channel "deployments:*", DockupUi.DeploymentChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

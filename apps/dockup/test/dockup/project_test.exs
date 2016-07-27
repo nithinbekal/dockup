@@ -2,30 +2,15 @@ defmodule Dockup.ProjectTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
-  test "project_id is of the format org_name/repo_name/branch for github https url" do
-    id = Dockup.Project.project_id("https://github.com/code-mancers/dockup.git", "master")
-    assert id == "code-mancers/dockup/master"
-  end
-
-  test "project_id is of the format org_name/repo_name/branch for github ssh url" do
-    id = Dockup.Project.project_id("git@github.com:code-mancers/dockup.git", "master")
-    assert id == "code-mancers/dockup/master"
-  end
-
-  test "project_id is of the format org_name/repo_name/branch for gitlab ssh url" do
-    id = Dockup.Project.project_id("git@your_server.com:code-mancers/dockup.git", "master")
-    assert id == "code-mancers/dockup/master"
-  end
-
   test "project_dir of a project is <Dockup workdir>/<project_id>" do
-    assert Dockup.Project.project_dir("foo/test/baz") == "#{Dockup.Configs.workdir}/foo/test/baz"
+    assert Dockup.Project.project_dir("foo") == "#{Dockup.Configs.workdir}/foo"
   end
 
   # Remove mocking in favor of dependency injection and make this test pass
   test "clone_repository clones the given branch of git repository into project_dir" do
     repository = "https://github.com/code-mancers/dockup.git"
     branch = "master"
-    project_dir = Dockup.Project.project_id(repository, branch) |> Dockup.Project.project_dir
+    project_dir = Dockup.Project.project_dir("foo")
 
     defmodule GitCloneCommand do
       def run(cmd, args) do
@@ -33,7 +18,7 @@ defmodule Dockup.ProjectTest do
         {"", 0}
       end
     end
-    Dockup.Project.clone_repository(repository, branch, GitCloneCommand)
+    Dockup.Project.clone_repository("foo", repository, branch, GitCloneCommand)
     [cmd | args] = String.split("git clone --branch=master --depth=1 #{repository} #{project_dir}")
 
     receive do
@@ -54,29 +39,60 @@ defmodule Dockup.ProjectTest do
       end
     end
     try do
-      Dockup.Project.clone_repository(repository, branch, FailingGitCloneCommand)
+      Dockup.Project.clone_repository("foo", repository, branch, FailingGitCloneCommand)
     rescue
       error ->
         assert error.message == "Cannot clone #{branch} of #{repository}. Error: cannot clone this shitz"
     end
   end
 
-  test "auto_detect_project_type returns :static_site if index.html is found" do
+  test "project_type returns :jekyll_site if project uses jekyll gem" do
+    project_id = "auto/detect/jekyll"
+    project_dir = Dockup.Project.project_dir project_id
+    File.mkdir_p project_dir
+    File.write! "#{project_dir}/Gemfile", """
+      source "https://rubygems.org"
+
+      gem 'capistrano', '~> 2.15'
+      gem 'jekyll'
+    """
+
+    assert Dockup.Project.project_type(project_id) == :jekyll_site
+    File.rm_rf Dockup.Configs.workdir <> "/auto"
+  end
+
+  test "project_type returns :jekyll_site if project uses jekyll gem and index.html file is also present" do
+    project_id = "auto/detect/jekyll"
+    project_dir = Dockup.Project.project_dir project_id
+    File.mkdir_p project_dir
+    File.write! "#{project_dir}/Gemfile", """
+      source "https://rubygems.org"
+
+      gem 'capistrano', '~> 2.15'
+      gem 'jekyll'
+    """
+    File.touch "#{project_dir}/index.html"
+
+    assert Dockup.Project.project_type(project_id) == :jekyll_site
+    File.rm_rf Dockup.Configs.workdir <> "/auto"
+  end
+
+  test "project_type returns :static_site if index.html is found" do
     project_id = "auto/detect/static"
     project_dir = Dockup.Project.project_dir project_id
     File.mkdir_p project_dir
     File.touch "#{project_dir}/index.html"
 
-    assert Dockup.Project.auto_detect_project_type(project_id) == :static_site
+    assert Dockup.Project.project_type(project_id) == :static_site
     File.rm_rf Dockup.Configs.workdir <> "/auto"
   end
 
-  test "auto_detect_project_type returns :unknown if auto detection fails" do
+  test "project_type returns :unknown if auto detection fails" do
     project_id = "auto/detect/none"
     project_dir = Dockup.Project.project_dir project_id
     File.mkdir_p project_dir
 
-    assert Dockup.Project.auto_detect_project_type(project_id) == :unknown
+    assert Dockup.Project.project_type(project_id) == :unknown
     File.rm_rf Dockup.Configs.workdir <> "/auto"
   end
 
@@ -90,11 +106,39 @@ defmodule Dockup.ProjectTest do
       end
     end
 
-    logs = capture_log(fn -> Dockup.Project.wait_till_up(%{"80" => "dummy_url"}, FakeHttp, 0) end)
+    urls = %{"web" => [%{"port" => "80", "url" => "dummy_url"}]}
+    logs = capture_log(fn -> Dockup.Project.wait_till_up(urls, FakeHttp, 0) end)
     assert logs =~ "Attempt 1 failed"
     assert logs =~ "Attempt 2 failed"
     refute logs =~ "Attempt 3 failed"
 
     Agent.stop(RetryCount)
+  end
+
+  test "project_dir_on_host host returns the dir of project on host" do
+    defmodule FakeContainer do
+      def workdir_on_host do
+        "/fake_workdir"
+      end
+    end
+    assert Dockup.Project.project_dir_on_host("foo", FakeContainer) == "/fake_workdir/foo"
+  end
+
+  test "start starts all containers, writes nginx config and restarts nginx container" do
+    defmodule FakeContainerForStarting do
+      def start_containers("foo"), do: send self, :containers_started
+      def port_mappings("foo"), do: "fake_ports"
+      def reload_nginx, do: send self, :nginx_reloaded
+    end
+
+    defmodule FakeNginxConfigForStarting do
+      def write_config("foo", "fake_ports"), do: send self, :nginx_config_written
+    end
+
+    Dockup.Project.start("foo", FakeContainerForStarting, FakeNginxConfigForStarting)
+
+    assert_received :containers_started
+    assert_received :nginx_config_written
+    assert_received :nginx_reloaded
   end
 end
