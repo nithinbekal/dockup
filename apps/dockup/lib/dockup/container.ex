@@ -40,6 +40,29 @@ defmodule Dockup.Container do
     end
   end
 
+  def run_logio_container(command \\ Dockup.Command, container \\ __MODULE__) do
+    {status, exit_code} = command.run("docker", ["inspect", "--format='{{.State.Running}}'", "logio"])
+    if status == "false" do
+      Logger.info "Logio container seems to be down. Trying to start."
+      {_output, 0} = command.run("docker", ["start", "logio"])
+      Logger.info "Logio started"
+    end
+
+    if exit_code == 1 do
+      Logger.info "Logio container not found."
+      # Sometimes docker pull fails, so we retry -
+      # Try 5 times at an interval of 0.5 seconds
+      retry 5 in 500 do
+        Logger.info "Trying to pull codemancers/logio-docker image"
+        {_output, 0} = command.run("docker", ["run", "--name", "logio",
+          "-d", "-p", "28778:28778",
+          "-v", "/var/run/docker.sock:/var/run/docker.sock",
+          "codemancers/logio-docker"])
+      end
+      Logger.info "Logio pulled and started"
+    end
+  end
+
   def reload_nginx(command \\ Dockup.Command) do
     Logger.info "Reloading nxinx config"
     {_out, 0} = command.run("docker", ["kill", "-s", "HUP", "nginx"])
