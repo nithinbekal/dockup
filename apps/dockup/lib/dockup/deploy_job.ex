@@ -13,7 +13,7 @@ defmodule Dockup.DeployJob do
     project.clone_repository(project_id, repository, branch)
 
     project_type = project.project_type(project_id)
-    callback.("starting", nil)
+    callback.("starting", log_url(project_id))
     urls = deploy_job.deploy(project_type, project_id)
 
     callback.("checking_urls", urls)
@@ -31,7 +31,7 @@ defmodule Dockup.DeployJob do
   end
 
   # Given a project type and project id, deploys the app and
-  # and returns a list : [{<port>, <http://ip_on_docker:port>, <haikunated_url>} ...]
+  # and returns %{"<service name>" => [%{"port" => "<container_port>", "url" => <"url">}, ...], ...}
   def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)
 
   def deploy(:unknown, _project_id, _config_generator, _project) do
@@ -44,5 +44,9 @@ defmodule Dockup.DeployJob do
     Logger.info "Deploying #{type} #{project_id}"
     config_generator.generate(type, project_id)
     project.start(project_id)
+  end
+
+  def log_url(project_id) do
+    %{ "log_url" => "/deployment_logs/#?projectName=#{project_id}" }
   end
 end

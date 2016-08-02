@@ -25,12 +25,12 @@ defmodule Dockup do
     # Make sure cache container exists
     Dockup.Container.create_cache_container
 
-    # Make sure nginx container is running
-    Dockup.Container.run_nginx_container
-
     # Make sure logio container is running.
     # This container will be used to tail logs
     # of docker-compose projects
     Dockup.Container.run_logio_container
+
+    # Make sure nginx container is running
+    Dockup.Container.run_nginx_container
   end
 end

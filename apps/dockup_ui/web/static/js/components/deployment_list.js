@@ -30,6 +30,8 @@ class DeploymentList extends Component {
           deployment.urls = payload;
         } else if(status == "deployment_failed") {
           deployment.urls = null;
+        } else if(status == "starting") {
+          deployment.logUrl = payload.log_url;
         }
         found = true;
       }
@@ -47,7 +49,29 @@ class DeploymentList extends Component {
 
   renderDeploymentUrls(urls) {
     if(urls) {
-      return JSON.stringify(urls);
+      let urlText = Object.keys(urls).map((key, index) =>{
+        return(
+          <div key={index}>
+            <div>
+              {key} :
+              {urls[key].map((map, index) => {
+                return(
+                    <a key={index} href={map.url}>Port {map.port}</a>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })
+      return urlText;
+    } else {
+      return "-";
+    }
+  }
+
+  renderLogUrl(url) {
+    if(url) {
+      return <a href={url} target="_blank">Open</a>;
     } else {
       return "-";
     }
@@ -76,6 +100,7 @@ class DeploymentList extends Component {
               <th>Branch</th>
               <th>Status</th>
               <th>URLs</th>
+              <th>Logs</th>
             </tr>
           </thead>
           <tbody>
@@ -87,6 +112,7 @@ class DeploymentList extends Component {
                   <td>{deployment.branch}</td>
                   <td>{deployment.status}</td>
                   <td>{this.renderDeploymentUrls(deployment.urls)}</td>
+                  <td>{this.renderLogUrl(deployment.logUrl)}</td>
                 </tr>
               )
              })}
