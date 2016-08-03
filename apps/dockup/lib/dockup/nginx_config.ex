@@ -16,7 +16,7 @@ defmodule Dockup.NginxConfig do
       }
 
       location /deployment_logs/ {
-        proxy_pass http://127.0.0.1:28778/;
+        proxy_pass http://#{logio_ip}:28778/;
       }
 
       location /socket.io {
