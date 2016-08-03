@@ -151,6 +151,17 @@ defmodule Dockup.Container do
     String.strip out
   end
 
+  def dockup_container_id do
+    # This is the only dependable way to get the container ID from within a
+    # docker container. The problem with using `hostname` is that it can be
+    # overridden when running the container.
+    # We use :os.cmd because this is a trusted command and we don't want
+    # to create a long argument list.
+    :os.cmd('cat /proc/self/cgroup | grep "docker/" | tail -1 | sed "s/^.*\\///"')
+    |> to_string
+    |> String.trim
+  end
+
   # If running in a docker container, returns the directory on host,
   # given a mounted volume on the container
   defp volume_host_dir(container_dir) do
@@ -171,17 +182,6 @@ defmodule Dockup.Container do
       raise "Cannot find volume mount destination: #{dir}"
     end
     host_dir
-  end
-
-  defp dockup_container_id do
-    # This is the only dependable way to get the container ID from within a
-    # docker container. The problem with using `hostname` is that it can be
-    # overridden when running the container.
-    # We use :os.cmd because this is a trusted command and we don't want
-    # to create a long argument list.
-    :os.cmd('cat /proc/self/cgroup | grep -o  -e "docker-.*.scope" | head -n 1 | sed "s/docker-\\(.*\\).scope/\\\\1/"')
-    |> to_string
-    |> String.trim
   end
 
   defp format_port_mapping([""]), do: []
