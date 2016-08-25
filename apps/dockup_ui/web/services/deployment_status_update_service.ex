@@ -23,11 +23,20 @@ defmodule DockupUi.DeploymentStatusUpdateService do
 
   def run(status, deployment, payload, channel) do
     with \
-      changeset <- Deployment.changeset(deployment, %{status: status}),
+      changeset <- prepare_changeset(status, deployment, payload),
       {:ok, deployment} <- Repo.update(changeset),
       :ok <- channel.update_deployment_status(deployment, payload)
     do
       {:ok, deployment}
     end
   end
+
+  defp prepare_changeset(status, deployment, payload) do
+    Deployment.changeset(deployment, changeset_map(status, payload))
+  end
+
+  defp changeset_map("starting", payload) do
+    %{status: "starting", service_urls: payload}
+  end
+  defp changeset_map(status, payload), do: %{status: status}
 end
