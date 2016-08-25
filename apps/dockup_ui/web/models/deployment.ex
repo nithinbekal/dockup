@@ -8,7 +8,7 @@ defmodule DockupUi.Deployment do
     field :branch, :string
     field :callback_url, :string
     field :status, :string # "deploying" -> "deployed"/"failed" -> "deleted"
-    field :service_urls, DockupUi.Types.JSON
+    field :service_urls, :map
 
     timestamps
   end

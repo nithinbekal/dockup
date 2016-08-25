@@ -40,4 +40,5 @@ config :dockup_ui, DockupUi.Repo,
   #password: "postgres",
   database: "dockup_ui_dev",
   hostname: "localhost",
-  pool_size: 10
+  pool_size: 10,
+  extensions: [{Postgrex.Extensions.JSON, [library: Poison]}]
