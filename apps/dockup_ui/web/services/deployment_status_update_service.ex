@@ -38,5 +38,5 @@ defmodule DockupUi.DeploymentStatusUpdateService do
   defp changeset_map("started", payload) do
     %{status: "started", service_urls: payload}
   end
-  defp changeset_map(status, payload), do: %{status: status}
+  defp changeset_map(status, _payload), do: %{status: status}
 end
