@@ -27,8 +27,10 @@ defmodule DeploymentStatusUpdateServiceTest do
 
   test "run returns {:ok, deployment} and persists payload" do
     deployment = insert(:deployment)
-    {:ok, updated_deployment} =
+    {:ok, _deployment} =
       DockupUi.DeploymentStatusUpdateService.run("started", deployment.id, @service_urls, FakeChannel)
+
+    updated_deployment = DockupUi.Repo.get(DockupUi.Deployment, deployment.id)
 
     assert updated_deployment.status == "started"
     assert updated_deployment.service_urls == @service_urls
