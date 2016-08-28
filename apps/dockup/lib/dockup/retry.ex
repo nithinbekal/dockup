@@ -1,7 +1,7 @@
 defmodule Dockup.Retry do
   require Logger
   # Credit for this code goes to safwank/ElixirRetry library
-  defmacro retry({ :in, _, [retries, sleep] }, do: block) do
+  defmacro retry({:in, _, [retries, sleep]}, do: block) do
     quote do
       run = fn(attempt, self) ->
         if attempt <= unquote(retries) do
