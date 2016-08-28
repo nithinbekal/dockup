@@ -5,6 +5,7 @@ defmodule Dockup.DeployJob do
     spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
+  @lint {Credo.Check.Refactor.FunctionArity, false}
   def perform(project_identifier, repository, branch, callback \\ Dockup.DefaultCallback.lambda, project \\ Dockup.Project,
                deploy_job \\ __MODULE__) do
     project_id = to_string(project_identifier)
