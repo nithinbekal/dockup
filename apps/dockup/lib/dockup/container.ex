@@ -80,7 +80,8 @@ defmodule Dockup.Container do
   # %{"<service name>" => [{"<container_port>", <"host_port">}, ...], ...}
   # This is used to generate an nginx config for the deployment.
   def port_mappings(project_id, container \\ __MODULE__) do
-    container.container_ids(project_id)
+    project_id
+    |> container.container_ids
     |> Enum.reduce(%{}, fn(x, acc) ->
       map = %{container.container_service_name(x) => {container.container_ip(x), container.port_mappings_for_container(x)}}
       Map.merge(acc, map)
@@ -138,6 +139,7 @@ defmodule Dockup.Container do
     end
   end
 
+  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defp ensure_volume_host_dir_exists(dir) do
     host_dir = volume_host_dir(dir) |> String.trim
     if host_dir == "" do
@@ -146,6 +148,7 @@ defmodule Dockup.Container do
     host_dir
   end
 
+  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defp dockup_container_id do
     # This is the only dependable way to get the container ID from within a
     # docker container. The problem with using `hostname` is that it can be

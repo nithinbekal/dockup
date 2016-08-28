@@ -2,11 +2,13 @@ defmodule Dockup.Configs do
   require Logger
   import DefMemo
 
+  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defmemo workdir do
     (System.get_env("DOCKUP_WORKDIR") || Application.fetch_env!(:dockup, :workdir))
     |> ensure_dir_exists |> Path.expand
   end
 
+  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defmemo nginx_config_dir do
     (System.get_env("DOCKUP_NGINX_CONFIG_DIR") || Application.fetch_env!(:dockup, :nginx_config_dir))
     |> ensure_dir_exists |> Path.expand
