@@ -8,12 +8,13 @@ defmodule DockupUi.Deployment do
     field :branch, :string
     field :callback_url, :string
     field :status, :string # "deploying" -> "deployed"/"failed" -> "deleted"
+    field :service_urls, :map
 
     timestamps
   end
 
   @required_fields ~w(git_url branch)
-  @optional_fields ~w(callback_url status)
+  @optional_fields ~w(callback_url status service_urls)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

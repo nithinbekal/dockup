@@ -15,26 +15,35 @@ Vagrant.configure(2) do |config|
     sudo apt-get update
     sudo apt-get install -y esl-erlang
     sudo apt-get install -y elixir
+    echo "Elixir installed"
 
-    # Install NodeJS and postgres for dockup_ui
-    sudo apt-get install -y postgresql
-    sudo apt-get install -y nodejs build-essential
-    wget -qO- https://deb.nodesource.com/setup_6.x | sudo bash
+    sudo apt-get install -y curl build-essential
 
+    # Install NodeJS for dockup_ui
+    curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    echo "node.js installed"
+
+    # Install postgres for dockup_ui
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main 9.5" >> /etc/apt/sources.list.d/pgdg.list
+    sudo apt-get update
+    sudo apt-get -y install postgresql-9.5 postgresql-client-9.5 postgresql-contrib-9.5
     sudo -u postgres createuser -s vagrant
-    sudo sh -c "echo 'local all all trust' > /etc/postgresql/9.3/main/pg_hba.conf"
-    sudo sh -c "echo 'host all all 127.0.0.1/32 trust' >> /etc/postgresql/9.3/main/pg_hba.conf"
+    sudo sh -c "echo 'local all all trust' > /etc/postgresql/9.5/main/pg_hba.conf"
+    sudo sh -c "echo 'host all all 127.0.0.1/32 trust' >> /etc/postgresql/9.5/main/pg_hba.conf"
     sudo service postgresql restart
-
-    sudo apt-get install -y curl
+    echo "Postgres 9.5 installed"
 
     # Install docker
     curl -sSL https://get.docker.com/ | sh
     sudo usermod -aG docker vagrant
+    echo "Docker installed"
 
     # Install docker compose
     sudo sh -c "curl -L https://github.com/docker/compose/releases/download/1.7.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose"
     sudo chmod +x /usr/local/bin/docker-compose
+    echo "docker-compose installed"
   SHELL
 
   config.vm.provider "virtualbox" do |v|
