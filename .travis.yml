@@ -25,7 +25,7 @@ script:
   - mix test
 
 cache:
-  - bundler
-  - directories:
+  bundler: true
+  directories:
     - deps
     - _build
