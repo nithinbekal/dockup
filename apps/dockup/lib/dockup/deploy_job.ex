@@ -1,13 +1,18 @@
 defmodule Dockup.DeployJob do
   require Logger
 
+  alias Dockup.{
+    DefaultCallback,
+    Project,
+  }
+
   def spawn_process(%{id: id, git_url: repository, branch: branch}, callback) do
     spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
   def perform(project_identifier, repository, branch,
-              callback \\ Dockup.DefaultCallback.lambda, options \\ []) do
-    project    = options[:project]    || Dockup.Project
+              callback \\ DefaultCallback.lambda, options \\ []) do
+    project    = options[:project]    || Project
     deploy_job = options[:deploy_job] || __MODULE__
 
     project_id = to_string(project_identifier)
