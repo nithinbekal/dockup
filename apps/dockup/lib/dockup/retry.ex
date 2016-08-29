@@ -1,7 +1,10 @@
 defmodule Dockup.Retry do
   require Logger
 
-  # Credit for this code goes to safwank/ElixirRetry library
+  @moduledoc """
+  Simple macro for retry.
+  Credit for this code goes to safwank/ElixirRetry library
+  """
 
   @lint false
   defmacro retry({:in, _, [retries, sleep]}, do: block) do
