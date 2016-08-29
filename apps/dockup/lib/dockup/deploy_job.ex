@@ -11,9 +11,9 @@ defmodule Dockup.DeployJob do
   end
 
   def perform(project_identifier, repository, branch,
-              callback \\ DefaultCallback.lambda, options \\ []) do
-    project    = options[:project]    || Project
-    deploy_job = options[:deploy_job] || __MODULE__
+              callback \\ DefaultCallback.lambda, deps \\ []) do
+    project    = deps[:project]    || Project
+    deploy_job = deps[:deploy_job] || __MODULE__
 
     project_id = to_string(project_identifier)
 
