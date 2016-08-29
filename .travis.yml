@@ -1,13 +1,29 @@
 language: elixir
+
 elixir:
-  - 1.3.1
+  - 1.3.2
+
 addons:
   postgresql: '9.4'
+
 services:
   - postgresql
+
+env:
+  global:
+    - MIX_ENV=test
+    - PULL_REQUEST_ID=$TRAVIS_PULL_REQUEST
+
 before_script:
   - cp apps/dockup_ui/config/travis.exs apps/dockup_ui/config/test.exs
-  - MIX_ENV=test mix do ecto.create, ecto.migrate
+  - mix do ecto.create, ecto.migrate
+  - rvm install ruby-2.3.1
+  - gem install pronto-credo
+
+script:
+  - if [ $PULL_REQUEST_ID != false ]; then pronto run -f github_pr; fi
+  - mix test
+
 cache:
   directories:
     - deps
