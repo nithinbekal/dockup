@@ -27,7 +27,7 @@ defmodule Dockup.DeployJobTest do
 
   test "performing a deployment triggers deployment using the project type" do
     Dockup.DeployJob.perform(123, "fake_repo", "fake_branch", FakeCallback.lambda,
-                             FakeProject, FakeDeployJob)
+                            project: FakeProject, deploy_job: FakeDeployJob)
     assert_received {"cloning_repo", nil}
     assert_received {"starting", nil}
     assert_received {"checking_urls", "fake_urls"}
@@ -41,7 +41,7 @@ defmodule Dockup.DeployJobTest do
       end
     end
     Dockup.DeployJob.perform(123, "fake_repo", "fake_branch", FakeCallback.lambda,
-                             FakeProject, FailingDeployJob)
+                            project: FakeProject, deploy_job: FailingDeployJob)
     assert_received {"deployment_failed", "An unexpected error occured when deploying 123 : ifuckedup"}
   end
 end
