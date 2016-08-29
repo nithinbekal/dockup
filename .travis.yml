@@ -28,4 +28,4 @@ cache:
   directories:
     - deps
     - _build
-    - ~/.rvm/gems/
+    - ~/.rvm
