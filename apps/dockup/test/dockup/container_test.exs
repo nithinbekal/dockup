@@ -90,8 +90,15 @@ defmodule Dockup.ContainerTest do
       end
     end
 
-    logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxCommand) end)
-    assert File.read!(Dockup.Configs.nginx_config_dir <> "/default.conf") == Dockup.NginxConfig.default_config
+    defmodule FakeLogioIpContainer do
+      def dockup_container_id, do: "dockup_container_id"
+      def container_ip("dockup_container_id"), do: "dockup_container_ip"
+      def container_ip("logio"), do: "logio_container_ip"
+    end
+
+    logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxCommand, FakeLogioIpContainer) end)
+    assert File.read!(Dockup.Configs.nginx_config_dir <> "/default.conf")
+      == Dockup.NginxConfig.default_config("dockup_container_ip", "logio_container_ip")
     assert logs =~ "Nginx container seems to be down. Trying to start"
     assert logs =~ "Nginx started"
 
@@ -110,9 +117,10 @@ defmodule Dockup.ContainerTest do
     end
 
     defmodule FakeContainer do
-      def nginx_config_dir_on_host do
-        "fake_dir_on_host"
-      end
+      def nginx_config_dir_on_host, do: "fake_dir_on_host"
+      def dockup_container_id, do: "dockup_container_id"
+      def container_ip("dockup_container_id"), do: "dockup_container_ip"
+      def container_ip("logio"), do: "logio_container_ip"
     end
 
     logs = capture_log(fn -> Dockup.Container.run_nginx_container(NginxDoesNotExistCommand, FakeContainer) end)

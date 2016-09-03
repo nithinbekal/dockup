@@ -29,7 +29,7 @@ defmodule Dockup.DeployJobTest do
     Dockup.DeployJob.perform(123, "fake_repo", "fake_branch", FakeCallback.lambda,
                              FakeProject, FakeDeployJob)
     assert_received {"cloning_repo", nil}
-    assert_received {"starting", nil}
+    assert_received {"starting", %{"log_url" => "/deployment_logs/#?projectName=123"}}
     assert_received {"checking_urls", "fake_urls"}
     assert_received {"started", "fake_urls"}
   end
