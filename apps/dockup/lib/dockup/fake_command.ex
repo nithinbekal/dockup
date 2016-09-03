@@ -11,6 +11,8 @@ defmodule Dockup.FakeCommand do
       ["inspect", "--format='{{ range .Mounts }}{{ if eq .Destination \"/home/travis/build/code-mancers/dockup/apps/dockup/test/fixtures/workdir\" }}{{ .Source }}{{ end }}{{ end }}'", "fake_docker_container_id"] => {"/fake_work_dir_on_host", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "fake_container_1"] => {"1.2.3.4", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "fake_container_2"] => {"1.2.3.5", 0},
+      ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "cat: /proc/self/cgroup: No such file or directory"] => {"1.2.3.6", 0},
+      ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "logio"] => {"1.2.3.7", 0},
       ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "fake_container_1"] => {"80/tcp\n4000/tcp", 0},
       ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "fake_container_2"] => {"", 0}
     },
