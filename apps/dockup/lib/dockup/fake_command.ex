@@ -12,6 +12,7 @@ defmodule Dockup.FakeCommand do
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "fake_container_1"] => {"1.2.3.4", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "fake_container_2"] => {"1.2.3.5", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "cat: /proc/self/cgroup: No such file or directory"] => {"1.2.3.6", 0},
+      ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", ""] => {"1.2.3.6", 0},
       ["inspect", "--format='{{.NetworkSettings.IPAddress}}'", "logio"] => {"1.2.3.7", 0},
       ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "fake_container_1"] => {"80/tcp\n4000/tcp", 0},
       ["inspect", "--format='{{range $key, $val := .NetworkSettings.Ports}}{{$key}}\n{{end}}'", "fake_container_2"] => {"", 0}
