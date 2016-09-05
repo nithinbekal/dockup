@@ -1,7 +1,7 @@
 defmodule Dockup.NginxConfig do
   require Logger
 
-  def default_config do
+  def default_config(dockup_ip, logio_ip) do
     """
     server {
       listen 80 default_server;
@@ -9,9 +9,25 @@ defmodule Dockup.NginxConfig do
       listen 443 default_server ssl;
       listen [::]:443 default_server ssl ipv6only=on;
 
-      return 404;
-
       server_name _ ;
+
+      location / {
+        proxy_pass http://#{dockup_ip}:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+      }
+
+      location /deployment_logs/ {
+        proxy_pass http://#{logio_ip}:28778/;
+      }
+
+      location /socket.io {
+        proxy_pass http://#{logio_ip}:28778;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+      }
     }
     """
   end

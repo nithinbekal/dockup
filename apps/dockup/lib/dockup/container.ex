@@ -17,7 +17,11 @@ defmodule Dockup.Container do
   end
 
   def run_nginx_container(command \\ Dockup.Command, container \\ __MODULE__) do
-    File.write!("#{Dockup.Configs.nginx_config_dir}/default.conf", Dockup.NginxConfig.default_config)
+    dockup_container_ip = container.container_ip(container.dockup_container_id)
+    logio_container_ip = container.container_ip("logio")
+    "#{Dockup.Configs.nginx_config_dir}/default.conf"
+    |> File.write!(Dockup.NginxConfig.default_config(dockup_container_ip, logio_container_ip))
+
     {status, exit_code} = command.run("docker", ["inspect", "--format='{{.State.Running}}'", "nginx"])
     if status == "false" do
       Logger.info "Nginx container seems to be down. Trying to start."
@@ -37,6 +41,29 @@ defmodule Dockup.Container do
           "nginx:1.8"])
       end
       Logger.info "Nginx pulled and started"
+    end
+  end
+
+  def run_logio_container(command \\ Dockup.Command, container \\ __MODULE__) do
+    {status, exit_code} = command.run("docker", ["inspect", "--format='{{.State.Running}}'", "logio"])
+    if status == "false" do
+      Logger.info "Logio container seems to be down. Trying to start."
+      {_output, 0} = command.run("docker", ["start", "logio"])
+      Logger.info "Logio started"
+    end
+
+    if exit_code == 1 do
+      Logger.info "Logio container not found."
+      # Sometimes docker pull fails, so we retry -
+      # Try 5 times at an interval of 0.5 seconds
+      retry 5 in 500 do
+        Logger.info "Trying to pull codemancers/logio-docker image"
+        {_output, 0} = command.run("docker", ["run", "--name", "logio",
+          "-d", "-p", "28778:28778",
+          "-v", "/var/run/docker.sock:/var/run/docker.sock",
+          "codemancers/logio-docker"])
+      end
+      Logger.info "Logio pulled and started"
     end
   end
 
@@ -124,6 +151,17 @@ defmodule Dockup.Container do
     String.strip out
   end
 
+  def dockup_container_id do
+    # This is the only dependable way to get the container ID from within a
+    # docker container. The problem with using `hostname` is that it can be
+    # overridden when running the container.
+    # We use :os.cmd because this is a trusted command and we don't want
+    # to create a long argument list.
+    :os.cmd('cat /proc/self/cgroup | grep "docker/" | tail -1 | sed "s/^.*\\///"')
+    |> to_string
+    |> String.trim
+  end
+
   # If running in a docker container, returns the directory on host,
   # given a mounted volume on the container
   defp volume_host_dir(container_dir) do
@@ -144,17 +182,6 @@ defmodule Dockup.Container do
       raise "Cannot find volume mount destination: #{dir}"
     end
     host_dir
-  end
-
-  defp dockup_container_id do
-    # This is the only dependable way to get the container ID from within a
-    # docker container. The problem with using `hostname` is that it can be
-    # overridden when running the container.
-    # We use :os.cmd because this is a trusted command and we don't want
-    # to create a long argument list.
-    :os.cmd('cat /proc/self/cgroup | grep -o  -e "docker-.*.scope" | head -n 1 | sed "s/docker-\\(.*\\).scope/\\\\1/"')
-    |> to_string
-    |> String.trim
   end
 
   defp format_port_mapping([""]), do: []
