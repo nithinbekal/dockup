@@ -6,7 +6,6 @@ defmodule Dockup.Retry do
   Credit for this code goes to safwank/ElixirRetry library
   """
 
-  @lint false
   defmacro retry({:in, _, [retries, sleep]}, do: block) do
     quote do
       run = fn(attempt, self) ->

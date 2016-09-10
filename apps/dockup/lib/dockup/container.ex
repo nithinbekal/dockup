@@ -139,7 +139,6 @@ defmodule Dockup.Container do
     end
   end
 
-  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defp ensure_volume_host_dir_exists(dir) do
     host_dir = volume_host_dir(dir) |> String.trim
     if host_dir == "" do
@@ -148,7 +147,6 @@ defmodule Dockup.Container do
     host_dir
   end
 
-  @lint {Credo.Check.Refactor.PipeChainStart, false}
   defp dockup_container_id do
     # This is the only dependable way to get the container ID from within a
     # docker container. The problem with using `hostname` is that it can be
