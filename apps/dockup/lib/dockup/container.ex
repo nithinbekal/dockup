@@ -44,7 +44,7 @@ defmodule Dockup.Container do
     end
   end
 
-  def run_logio_container(command \\ Dockup.Command, container \\ __MODULE__) do
+  def run_logio_container(command \\ Dockup.Command) do
     {status, exit_code} = command.run("docker", ["inspect", "--format='{{.State.Running}}'", "logio"])
     if status == "false" do
       Logger.info "Logio container seems to be down. Trying to start."
