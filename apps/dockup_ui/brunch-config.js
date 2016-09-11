@@ -21,7 +21,10 @@ exports.config = {
       // }
     },
     stylesheets: {
-      joinTo: "css/app.css"
+      joinTo: "css/app.css",
+      order: {
+        after: ["web/static/css/app.scss"]
+      }
     },
     templates: {
       joinTo: "js/app.js"
@@ -53,6 +56,16 @@ exports.config = {
       presets: ["es2015", "react"],
       // Do not use ES6 compiler in vendor code
       ignore: [/web\/static\/vendor/]
+    },
+    copycat: {
+      // Copy bootstrap fonts to priv/static/fonts
+      "fonts": ["node_modules/bootstrap-sass/assets/fonts/bootstrap"]
+    },
+    sass: {
+      options: {
+        includePaths: ["node_modules/bootstrap-sass/assets/stylesheets"],
+        precision: 8
+      }
     }
   },
 
@@ -63,9 +76,10 @@ exports.config = {
   },
 
   npm: {
-    enabled: true,
-    // Whitelist the npm deps to be pulled in as front-end assets.
-    // All other deps in package.json will be excluded from the bundle.
-    whitelist: ["phoenix", "phoenix_html", "react", "react-dom"]
+    globals: {
+      $: 'jquery',
+      jQuery: 'jquery',
+      bootstrap: 'bootstrap-sass'
+    }
   }
 };
