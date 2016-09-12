@@ -1,12 +1,20 @@
 defmodule Dockup.DeployJob do
   require Logger
 
+  alias Dockup.{
+    DefaultCallback,
+    Project,
+  }
+
   def spawn_process(%{id: id, git_url: repository, branch: branch}, callback) do
     spawn(fn -> perform(id, repository, branch, callback) end)
   end
 
-  def perform(project_identifier, repository, branch, callback \\ Dockup.DefaultCallback.lambda, project \\ Dockup.Project,
-               deploy_job \\ __MODULE__) do
+  def perform(project_identifier, repository, branch,
+              callback \\ DefaultCallback.lambda, deps \\ []) do
+    project    = deps[:project]    || Project
+    deploy_job = deps[:deploy_job] || __MODULE__
+
     project_id = to_string(project_identifier)
 
     callback.("cloning_repo", nil)
@@ -30,8 +38,10 @@ defmodule Dockup.DeployJob do
       callback.("deployment_failed", message)
   end
 
-  # Given a project type and project id, deploys the app and
-  # and returns %{"<service name>" => [%{"port" => "<container_port>", "url" => <"url">}, ...], ...}
+  @doc """
+  Given a project type and project id, deploys the app and
+  and returns a list : [{<port>, <http://ip_on_docker:port>, <haikunated_url>} ...]
+  """
   def deploy(type, project_id, config_generator \\ Dockup.ConfigGenerator, project \\ Dockup.Project)
 
   def deploy(:unknown, _project_id, _config_generator, _project) do

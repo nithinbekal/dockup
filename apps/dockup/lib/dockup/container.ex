@@ -107,7 +107,8 @@ defmodule Dockup.Container do
   # %{"<service name>" => [{"<container_port>", <"host_port">}, ...], ...}
   # This is used to generate an nginx config for the deployment.
   def port_mappings(project_id, container \\ __MODULE__) do
-    container.container_ids(project_id)
+    project_id
+    |> container.container_ids
     |> Enum.reduce(%{}, fn(x, acc) ->
       map = %{container.container_service_name(x) => {container.container_ip(x), container.port_mappings_for_container(x)}}
       Map.merge(acc, map)

@@ -1,6 +1,8 @@
 defmodule DockupUi.DeploymentStatusUpdateService do
-  # This module is responsible for updating the status of the deployment
-  # in the DB as well as broadcasting the status update over the websocket.
+  @moduledoc """
+  This module is responsible for updating the status of the deployment
+  in the DB as well as broadcasting the status update over the websocket.
+  """
 
   require Logger
 

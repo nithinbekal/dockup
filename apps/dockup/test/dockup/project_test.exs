@@ -2,6 +2,8 @@ defmodule Dockup.ProjectTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
+  alias Dockup.Project
+
   test "project_dir of a project is <Dockup workdir>/<project_id>" do
     assert Dockup.Project.project_dir("foo") == "#{Dockup.Configs.workdir}/foo"
   end
@@ -48,7 +50,7 @@ defmodule Dockup.ProjectTest do
 
   test "project_type returns :jekyll_site if project uses jekyll gem" do
     project_id = "auto/detect/jekyll"
-    project_dir = Dockup.Project.project_dir project_id
+    project_dir = Project.project_dir(project_id)
     File.mkdir_p project_dir
     File.write! "#{project_dir}/Gemfile", """
       source "https://rubygems.org"
@@ -101,7 +103,7 @@ defmodule Dockup.ProjectTest do
     defmodule FakeHttp do
       def get_status("dummy_url") do
         count = Agent.get(RetryCount, fn count -> count end)
-        Agent.update(RetryCount, fn count -> count+1 end)
+        Agent.update(RetryCount, fn count -> count + 1 end)
         if count == 3, do: 200, else: 404
       end
     end

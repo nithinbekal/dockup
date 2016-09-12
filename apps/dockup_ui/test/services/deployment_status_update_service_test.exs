@@ -11,7 +11,7 @@ defmodule DeploymentStatusUpdateServiceTest do
     def update_deployment_status(_params, _payload), do: :ok
   end
 
-  @service_urls %{ "web" => [
+  @service_urls %{"web" => [
     %{"port" => "8000", "url" => "http://random_string_1.dockup.codemancers.com"},
     %{"port" => "4000", "url" => "http://random_string_2.dockup.codemancers.com"}
   ]}

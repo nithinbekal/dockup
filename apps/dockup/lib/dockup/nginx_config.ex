@@ -36,7 +36,9 @@ defmodule Dockup.NginxConfig do
   # e.g.
   # [{"container_ip", "host_port", "haikunated_url"},...]
   def config_proxy_passing_port(proxy_urls) do
-    Enum.map(proxy_urls, &proxy_passing_port&1) |> Enum.join("\n")
+    proxy_urls
+    |> Enum.map(&proxy_passing_port&1)
+    |> Enum.join("\n")
   end
 
   def config_file(project_id) do
